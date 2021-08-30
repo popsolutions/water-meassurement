@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:water_meassurement/app/config/app_images.dart';
+import 'package:water_meassurement/app/config/app_routes.dart';
+import 'package:water_meassurement/app/shared/models/user_model.dart';
 import 'login_controller.dart';
 
 class LoginPage extends GetView<LoginController> {
@@ -85,7 +87,13 @@ class LoginPage extends GetView<LoginController> {
                           ),
                           child: Text('Entrar'),
                           onPressed: () async {
-                            // Get.toNamed(Routes.HOME);
+                            await controller.login(
+                              UserModel(
+                                username: 'support@popsolutions.co',
+                                password: '1ND1C0p4c1f1c0',
+                              ),
+                            );
+                            Get.toNamed(Routes.HOME);
                           },
                         ),
                       ),

@@ -11,7 +11,7 @@ class Odoo extends GetConnect {
   var version = OdooVersion();
   String? _sessionId;
   int? _uuid;
-  String? cookie;
+  String cookie = '';
 
   String createPath(String path) {
     return _serverURL + path;
@@ -34,16 +34,22 @@ class Odoo extends GetConnect {
   }
 
   // Authenticate user
-  Future authenticate(String username, String password, String database) async {
-    var url = createPath("/web/session/authenticate");
-    var params = {
-      "db": 'dev.riveira',
+  Future<dynamic> authenticate(String username, String password) async {
+    final path = createPath("/web/session/authenticate");
+    final params = {
+      "db": 'riviera-dev', //TODO: MUDAR A TODO NOVO PROJETO
       "login": username,
       "password": password,
       "context": {}
     };
-    final response = await callDbRequest(url, createPayload(params));
-    return response;
+    final response = await callDbRequest(path, createPayload(params));
+
+    final data = response.body;
+    if (data["error"] != null) {
+      throw ("invalid username or password");
+    }
+
+    return response.body['result'];
   }
 
   Future<OdooResponse> read(String model, List<int> ids, List<String> fields,
@@ -181,7 +187,7 @@ class Odoo extends GetConnect {
   Future callDbRequest(String url, Map payload) async {
     var body = json.encode(payload);
     _headers["Content-type"] = "application/json; charset=UTF-8";
-    _headers["Cookie"] = cookie!;
+    _headers["Cookie"] = cookie;
     print("------------------------------------------->>>>");
     print("REQUEST: $url\n");
     print("BODY:\n $body\n");
@@ -191,7 +197,7 @@ class Odoo extends GetConnect {
     });
     print("------------------------------------------->>>>");
     // final response = await post(url, body: body, headers: _headers);
-    final response = await post(url, body);
+    final response = await post(url, body, headers: _headers);
     _updateCookies(response);
     print("<<<<============================================");
     print("RESPONSE: ${response.body}");
