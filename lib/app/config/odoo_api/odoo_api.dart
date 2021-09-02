@@ -10,7 +10,7 @@ class Odoo extends GetConnect {
   Map<String, String> _headers = {};
   var version = OdooVersion();
   String? _sessionId;
-  int? _uuid;
+  int? _uid;
   String cookie = '';
 
   String createPath(String path) {
@@ -37,7 +37,7 @@ class Odoo extends GetConnect {
   Future<dynamic> authenticate(String username, String password) async {
     final path = createPath("/web/session/authenticate");
     final params = {
-      "db": 'riviera-dev', //TODO: MUDAR A TODO NOVO PROJETO
+      "db": 'riviera-new',
       "login": username,
       "password": password,
       "context": {}
@@ -170,7 +170,7 @@ class Odoo extends GetConnect {
   }
 
   Map getContext() {
-    return {"lang": "en_US", "tz": "Europe/Brussels", "uid": _uuid};
+    return {"lang": "en_US", "tz": "Europe/Brussels", "uid": _uid};
   }
 
   Future<OdooResponse> callRequest(String url, Map payload) async {

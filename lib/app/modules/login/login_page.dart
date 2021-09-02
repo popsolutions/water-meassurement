@@ -10,6 +10,9 @@ import 'login_controller.dart';
 class LoginPage extends GetView<LoginController> {
   final controller = Get.put(LoginController());
 
+  
+
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -93,7 +96,7 @@ class LoginPage extends GetView<LoginController> {
                                 password: '1ND1C0p4c1f1c0',
                               ),
                             );
-                            Get.toNamed(Routes.HOME);
+                            Get.offNamed(Routes.HOME);
                           },
                         ),
                       ),

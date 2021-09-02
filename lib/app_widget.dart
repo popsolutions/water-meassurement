@@ -10,6 +10,11 @@ class AppWidget extends StatelessWidget {
         primaryColor: Color(0xFF244579),
         accentColor: Color(0xFF244579),
         scaffoldBackgroundColor: Color(0xFF244579),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            primary: Color(0xFF244579),
+          ),
+        ),
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: Routes.LOGIN,
