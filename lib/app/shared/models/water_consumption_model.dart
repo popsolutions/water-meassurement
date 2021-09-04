@@ -4,7 +4,7 @@ class WaterConsumptionModel {
   String? landId;
   String? date;
   double? lastRead;
-  String? currentRead;
+  double? currentRead;
   double? consumption;
   int? readerId;
   String? total;
@@ -16,7 +16,7 @@ class WaterConsumptionModel {
     this.lastRead,
     this.currentRead,
     this.consumption,
-    this.readerId,
+    this.readerId = 8083,
     this.total,
     this.state = 'draft',
   });

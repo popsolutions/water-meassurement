@@ -176,7 +176,7 @@ class Odoo extends GetConnect {
   Future<OdooResponse> callRequest(String url, Map payload) async {
     final response = await callDbRequest(url, payload);
     OdooResponse odooResponse =
-        new OdooResponse(json.decode(response.body), response.statusCode);
+        new OdooResponse(response.body, response.statusCode);
 
     if (odooResponse.hasError())
       throw odooResponse.getErrorMessage().toString();
@@ -196,7 +196,6 @@ class Odoo extends GetConnect {
       print(key + ':' + (value ?? '') + '\n');
     });
     print("------------------------------------------->>>>");
-    // final response = await post(url, body: body, headers: _headers);
     final response = await post(url, body, headers: _headers);
     _updateCookies(response);
     print("<<<<============================================");

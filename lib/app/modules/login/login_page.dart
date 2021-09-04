@@ -4,14 +4,25 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:water_meassurement/app/config/app_images.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
+import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 import 'package:water_meassurement/app/shared/models/user_model.dart';
 import 'login_controller.dart';
 
-class LoginPage extends GetView<LoginController> {
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final auth = Get.put(AuthController());
   final controller = Get.put(LoginController());
 
-  
-
+  @override
+  void initState() {
+    super.initState();
+    auth.emailEC.text = 'support@popsolutions.co';
+    auth.passwordEC.text = '1ND1C0p4c1f1c0';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,26 +66,26 @@ class LoginPage extends GetView<LoginController> {
                   child: Column(
                     children: [
                       TextFormField(
-                        initialValue: 'support@popsolutions.co',
+                        controller: auth.emailEC,
                         decoration: InputDecoration(
                           suffixIcon: Icon(Icons.person),
                         ),
                       ),
                       Obx(() {
                         return TextFormField(
-                          initialValue: '1ND1C0p4c1f1c0',
-                          obscureText: controller.isPasswordVisible.value,
+                          controller: auth.passwordEC,
+                          obscureText: controller.isPasswordObscure.value,
                           decoration: InputDecoration(
                             floatingLabelBehavior: FloatingLabelBehavior.always,
                             suffixIcon: IconButton(
                               icon: Icon(
-                                controller.isPasswordVisible.value
+                                controller.isPasswordObscure.value
                                     ? Icons.visibility_off
                                     : Icons.remove_red_eye,
                               ),
                               onPressed: () {
-                                controller.isPasswordVisible.value =
-                                    !controller.isPasswordVisible.value;
+                                controller.isPasswordObscure.value =
+                                    !controller.isPasswordObscure.value;
                               },
                             ),
                           ),
@@ -90,12 +101,13 @@ class LoginPage extends GetView<LoginController> {
                           ),
                           child: Text('Entrar'),
                           onPressed: () async {
-                            await controller.login(
+                            await auth.login(
                               UserModel(
                                 username: 'support@popsolutions.co',
                                 password: '1ND1C0p4c1f1c0',
                               ),
                             );
+
                             Get.offNamed(Routes.HOME);
                           },
                         ),

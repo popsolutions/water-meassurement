@@ -1,18 +1,18 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
-import 'package:water_meassurement/app/modules/login/login_service.dart';
-import 'package:water_meassurement/app/shared/models/user_model.dart';
+import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 
 class LoginController extends GetxController {
-  var isPasswordVisible = false.obs;
-  final _service = LoginService();
-  UserModel? user;
+  var isPasswordObscure = true.obs;
 
-  Future login(UserModel user) async {
-    user = await _service.login(user);
-  }
+  containUser(BuildContext context) {
+    final user = Provider.of<AuthController>(
+      context,
+      listen: false,
+    ).currentUser;
 
-  contemUsuario() {
     if (user != null) {
       Get.offNamed(Routes.HOME);
     } else {
