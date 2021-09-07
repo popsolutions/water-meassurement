@@ -1,10 +1,9 @@
-import 'package:get/get.dart';
 import 'package:water_meassurement/app/config/app_constants.dart';
-import 'package:water_meassurement/app/shared/global.dart';
+import 'package:water_meassurement/app/shared/utils/global.dart';
 import 'package:water_meassurement/app/shared/models/land_model.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 
-class HomeService extends GetxService {
+class HomeService {
   Future<void> saveWaterConsumption(WaterConsumptionModel wc) async {
     await odoo.create(
       AppConstants.waterConsumptionModel,
@@ -13,11 +12,7 @@ class HomeService extends GetxService {
   }
 
   Future<void> readWaterConsumption() async {
-    await odoo.searchRead(
-      AppConstants.waterConsumptionModel,
-      [],
-      [],
-    );
+    await odoo.searchRead(AppConstants.waterConsumptionModel, [], []);
   }
 
   Future<List<LandModel>> getLands() async {

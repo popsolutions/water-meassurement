@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:water_meassurement/app/shared/global.dart';
+import 'package:water_meassurement/app/shared/utils/global.dart';
 import 'package:water_meassurement/app/shared/models/user_model.dart';
 
 class LoginService extends GetxService {

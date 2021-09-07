@@ -24,6 +24,5 @@ class LandModel {
   }
 
   String toJson() => json.encode(toMap());
-
   factory LandModel.fromJson(dynamic source) => LandModel.fromMap(source);
 }

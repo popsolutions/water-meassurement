@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:water_meassurement/app/config/app_images.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
+import 'package:water_meassurement/app/modules/home/home_controller.dart';
 import 'package:water_meassurement/app/shared/models/user_model.dart';
 import 'login_controller.dart';
 
@@ -14,8 +15,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final auth = Get.put(AuthController());
-  final controller = Get.put(LoginController());
+  final AuthController auth = Get.find();
+  final LoginController controller = Get.find();
+  final HomeController homeController = Get.find();
 
   @override
   void initState() {
@@ -107,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                                 password: '1ND1C0p4c1f1c0',
                               ),
                             );
-
+                            await homeController.saveLandsDB();
                             Get.offNamed(Routes.HOME);
                           },
                         ),

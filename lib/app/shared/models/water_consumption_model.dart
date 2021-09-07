@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class WaterConsumptionModel {
-  String? landId;
+  int? landId;
   String? date;
   double? lastRead;
   double? currentRead;
