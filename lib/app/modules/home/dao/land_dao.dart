@@ -5,17 +5,8 @@ import 'package:water_meassurement/app/shared/models/land_model.dart';
 class LandDao {
   late Database _db;
 
-  Future<void> saveLands(List<LandModel> lands) async {
+  Future<void> saveLandsDao(List<LandModel> lands) async {
     _db = await AppDatabase.instance.database;
-
-    //   await _db.insert('lands', land.toMap());
-    // }).toList();
-
-    // lands.map((LandModel land) async {
-    //   await _db.transaction((txn) async {
-    //     await txn.insert('lands', land.toMap());
-    //   });
-    // }).toList();
 
     await _db.transaction((txn) async {
       lands.forEach((LandModel land) async {

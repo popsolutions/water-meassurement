@@ -1,9 +1,12 @@
-import 'package:dropdown_search/dropdown_search.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:searchfield/searchfield.dart';
+import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 import 'package:water_meassurement/app/shared/models/land_model.dart';
-
 import 'home_controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,13 +16,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final HomeController _controller = Get.find();
-  var valueChoose;
+  final AuthController auth = Get.find();
 
   @override
   void initState() {
     super.initState();
-    _controller.currentWaterConsumption.date =
-        _controller.format.format(DateTime.now());
+    _controller.currentWaterConsumption.readerId = Provider.of<AuthController>(
+      context,
+      listen: false,
+    ).currentUser.partnerId;
   }
 
   @override
@@ -28,6 +33,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Water Consumption'),
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         centerTitle: true,
       ),
       body: Container(
@@ -37,37 +43,48 @@ class _HomePageState extends State<HomePage> {
             physics: BouncingScrollPhysics(),
             child: Column(
               children: [
+                Obx(() {
+                  return SearchField(
+                    suggestions: _controller.lands
+                        .map((LandModel land) =>
+                            '${land.name!} (ID: ${land.id!})')
+                        .toList(),
+                    hint: "Selecione um Terreno",
+                    searchStyle: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black.withOpacity(0.8),
+                    ),
+                    searchInputDecoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.black.withOpacity(0.8),
+                        ),
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
+                    ),
+                    maxSuggestionsInViewPort: 5,
+                    itemHeight: 50,
+                    onTap: (x) {
+                      _controller.currentWaterConsumption.landId =
+                          int.parse(x!.split(' ').last.replaceAll(')', ''));
+                    },
+                  );
+                }),
+
                 // Obx(() {
-                //   return DropdownButton(
-                //     value: valueChoose,
-                //     isExpanded: true,
-                //     hint: Text('Selecionar Terreno'),
-                //     onChanged: (newValue) {
-                //       setState(() {
-                //         valueChoose = newValue;
-                //       });
-                //     },
-                //     items: _controller.lands.map((LandModel land) {
-                //       return DropdownMenuItem(
-                //         value: land.id,
-                //         child: Text(land.name!),
-                //         onTap: () {
-                //           _controller.currentWaterConsumption.landId = land.id;
-                //         },
-                //       );
-                //     }).toList(),
-                //   );
+                // return DropdownSearch(
+                //   mode: Mode.MENU,
+                //   items: _controller.lands
+                //       .map((LandModel land) => land.name!)
+                //       .toList(),
+                //   label: "Selecione um Terreno",
+                //   onChanged: (land) {
+                //     // _controller.currentWaterConsumption.landId = land!.id;
+                //   },
+                // );
                 // }),
-                DropdownSearch<String>(
-                  mode: Mode.BOTTOM_SHEET,
-                  items: _controller.lands
-                      .map((LandModel land) => land.name!)
-                      .toList(),
-                  label: "Selecione um Terreno",
-                  // onChanged: (LandModel? land) {
-                  //   _controller.currentWaterConsumption.landId = land!.id;
-                  // },
-                ),
                 SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -112,14 +129,27 @@ class _HomePageState extends State<HomePage> {
                   child: ElevatedButton(
                     child: Text('Salvar Medição'),
                     onPressed: () async {
-                      // await _controller.saveWaterConsumption()
+                      _controller.isLoading.value = true;
+                      await _controller.saveWaterConsumption();
+                      _controller.isLoading.value = false;
+
                       print(_controller.currentWaterConsumption.toJson());
-                      // await _controller.readWaterConsumption();
-                      // await _controller.getLands();
-                      // print(_controller.currentWaterConsumption.toJson());
+                      print(Provider.of<AuthController>(
+                        context,
+                        listen: false,
+                      ).currentUser.toJson());
                     },
                   ),
                 ),
+                SizedBox(height: 50),
+                Obx(() {
+                  return Visibility(
+                    visible: _controller.isLoading.value,
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  );
+                }),
               ],
             ),
           ),

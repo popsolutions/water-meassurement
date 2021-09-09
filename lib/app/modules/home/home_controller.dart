@@ -9,18 +9,21 @@ class HomeController extends GetxController {
   final HomeService _service;
   final LandDao _dao;
   HomeController(this._service, this._dao);
-  RxList<LandModel> lands = <LandModel>[].obs;
+
+  var lands = <LandModel>[].obs;
+  var isLoading = false.obs;
+  final format = DateFormat('dd/MM/yyyy');
+  var currentWaterConsumption = WaterConsumptionModel();
 
   @override
   onInit() async {
     super.onInit();
-    await getLandsDao();
+    currentWaterConsumption.date = format.format(DateTime.now());
+
+    await getLandsDB();
   }
 
-  var currentWaterConsumption = WaterConsumptionModel();
-  final format = DateFormat('dd/MM/yyyy');
-
-  saveWaterConsumption(WaterConsumptionModel currentWaterConsumption) async {
+  saveWaterConsumption() async {
     await _service.saveWaterConsumption(currentWaterConsumption);
   }
 
@@ -32,16 +35,18 @@ class HomeController extends GetxController {
     return await _service.getLands();
   }
 
-  Future<void> getLandsDao() async {
-    lands.value = await _dao.getLandsDao();
+  Future<void> getLandsDB() async {
+    final landsDao = await _dao.getLandsDao();
+    if (landsDao.isNotEmpty) {
+      lands.value = landsDao;
+    }
   }
 
   Future<void> saveLandsDB() async {
-    lands.value = await _dao.getLandsDao();
-    if (lands.isNotEmpty) {
-      return;
-    }
     final landsApi = await _service.getLands();
-    await _dao.saveLands(landsApi);
+    final landsDao = await _dao.getLandsDao();
+    if (landsDao.isEmpty) {
+      await _dao.saveLandsDao(landsApi);
+    }
   }
 }

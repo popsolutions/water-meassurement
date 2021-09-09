@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:water_meassurement/app/config/app_images.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
@@ -24,6 +27,13 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     auth.emailEC.text = 'support@popsolutions.co';
     auth.passwordEC.text = '1ND1C0p4c1f1c0';
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    auth.emailEC.dispose();
+    auth.passwordEC.dispose();
   }
 
   @override
@@ -103,13 +113,20 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child: Text('Entrar'),
                           onPressed: () async {
-                            await auth.login(
+                            controller.isLoading.value = true;
+
+                            await Provider.of<AuthController>(
+                              context,
+                              listen: false,
+                            ).login(
                               UserModel(
                                 username: 'support@popsolutions.co',
                                 password: '1ND1C0p4c1f1c0',
                               ),
                             );
+
                             await homeController.saveLandsDB();
+                            controller.isLoading.value = false;
                             Get.offNamed(Routes.HOME);
                           },
                         ),
@@ -117,6 +134,13 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 50),
+                Obx(() {
+                  return Visibility(
+                    visible: controller.isLoading.value,
+                    child: CircularProgressIndicator(color: Colors.white),
+                  );
+                }),
               ],
             ),
           ),

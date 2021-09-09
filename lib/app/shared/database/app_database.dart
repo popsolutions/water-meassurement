@@ -28,7 +28,7 @@ class AppDatabase {
   }
 
   String get _lands => ''' 
-  CREATE TABLE lands (
+  CREATE TABLE IF NOT EXISTS lands (
     id INT PRIMARY KEY,
     name TEXT
     );

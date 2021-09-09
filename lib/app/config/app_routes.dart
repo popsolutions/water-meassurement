@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:water_meassurement/app/modules/login/login_page.dart';
 import 'package:water_meassurement/app/modules/home/home_page.dart';
-import 'package:water_meassurement/app/config/app_bindings.dart';
+import 'app_bindings.dart';
 
 class AppRoutes {
   static final routes = [

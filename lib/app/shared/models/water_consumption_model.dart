@@ -5,9 +5,9 @@ class WaterConsumptionModel {
   String? date;
   double? lastRead;
   double? currentRead;
-  double? consumption;
+  // double? consumption;
   int? readerId;
-  String? total;
+  // String? total;
   String? state;
 
   WaterConsumptionModel({
@@ -15,9 +15,9 @@ class WaterConsumptionModel {
     this.date,
     this.lastRead,
     this.currentRead,
-    this.consumption,
-    this.readerId = 8083,
-    this.total,
+    // this.consumption,
+    this.readerId,
+    // this.total,
     this.state = 'draft',
   });
 
@@ -27,9 +27,9 @@ class WaterConsumptionModel {
       'date': date,
       'last_read': lastRead,
       'current_read': currentRead,
-      'consumption': consumption,
+      // 'consumption': consumption,
       'reader_id': readerId,
-      'total': total,
+      // 'total': total,
       'state': state,
     };
   }
@@ -40,9 +40,9 @@ class WaterConsumptionModel {
       date: map['date'],
       lastRead: map['last_read'],
       currentRead: map['current_read'],
-      consumption: map['consumption'],
+      // consumption: map['consumption'],
       readerId: map['reader_id'],
-      total: map['total'],
+      // total: map['total'],
       state: map['state'],
     );
   }
