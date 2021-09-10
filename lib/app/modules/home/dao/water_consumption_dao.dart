@@ -28,4 +28,9 @@ class WaterConsumptionDao {
     }
     return waterConsumptios;
   }
+
+  Future<void> logout() async {
+    _db = await AppDatabase.instance.database;
+    await _db.delete('waterConsumption');
+  }
 }

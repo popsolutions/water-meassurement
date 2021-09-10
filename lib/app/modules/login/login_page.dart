@@ -80,6 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                           suffixIcon: Icon(Icons.person),
                         ),
                       ),
+                      SizedBox(height: 10),
                       Obx(() {
                         return TextFormField(
                           controller: auth.passwordEC,

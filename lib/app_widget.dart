@@ -24,6 +24,26 @@ class AppWidget extends StatelessWidget {
               primary: Color(0xFF244579),
             ),
           ),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            contentPadding: EdgeInsets.only(
+              left: 23,
+              top: 25,
+              bottom: 25,
+            ),
+            fillColor: Color(0xFFF0F5F7),
+            hintStyle: TextStyle(
+              fontSize: 18,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w600,
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.all(
+                Radius.circular(55),
+              ),
+            ),
+          ),
         ),
         debugShowCheckedModeBanner: false,
         initialRoute: Routes.LOGIN,

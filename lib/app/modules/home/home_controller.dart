@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:water_meassurement/app/config/app_routes.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 import 'package:water_meassurement/app/modules/home/home_service.dart';
 import 'package:water_meassurement/app/shared/models/land_model.dart';
@@ -21,6 +22,8 @@ class HomeController extends GetxController {
   final landEC = TextEditingController();
   final currentReadEC = TextEditingController();
   final lastReadEC = TextEditingController();
+  var titleAppBar = ['Nova Leitura', 'Perfil'];
+  var index = 0.obs;
 
   @override
   onInit() async {
@@ -66,5 +69,10 @@ class HomeController extends GetxController {
     landEC.text = '';
     currentReadEC.text = '';
     lastReadEC.text = '';
+  }
+
+  Future<void> logout() async {
+    await _dao.logout();
+    Get.offAllNamed(Routes.LOGIN);
   }
 }
