@@ -1,10 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:water_meassurement/app/config/app_images.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
@@ -125,7 +122,8 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             );
 
-                            await homeController.saveLandsDB();
+                            // await homeController.saveLandsDB();
+                            await homeController.loginSaveWaterConsumptionsDB();
                             controller.isLoading.value = false;
                             Get.offNamed(Routes.HOME);
                           },
@@ -145,13 +143,13 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-        bottomNavigationBar: GestureDetector(
-          onTap: () async => await launch('https://popsolutions.co/'),
-          child: Container(
-            color: Colors.transparent,
-            height: 60,
-            margin: const EdgeInsets.only(bottom: 20),
-            child: Image.asset(AppImages.popSolutionsLogo),
+        bottomNavigationBar: Container(
+          color: Colors.transparent,
+          height: 40,
+          margin: const EdgeInsets.only(bottom: 20),
+          child: Image.asset(
+            AppImages.logo,
+            color: Colors.white,
           ),
         ),
       ),

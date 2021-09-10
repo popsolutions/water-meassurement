@@ -1,12 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
-import 'package:water_meassurement/app/shared/models/land_model.dart';
+import 'package:water_meassurement/app/modules/profile/profile_page.dart';
+import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 import 'home_controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,14 +15,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final HomeController _controller = Get.find();
   final AuthController auth = Get.find();
+  final pc = PageController(initialPage: 0).obs;
 
   @override
-  void initState() {
-    super.initState();
-    _controller.currentWaterConsumption.readerId = Provider.of<AuthController>(
-      context,
-      listen: false,
-    ).currentUser.partnerId;
+  void dispose() {
+    super.dispose();
+    pc.value.dispose();
+    _controller.landEC.dispose();
+    _controller.currentReadEC.dispose();
+    _controller.lastReadEC.dispose();
   }
 
   @override
@@ -32,128 +31,135 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Water Consumption'),
+        title: const Text('Nova Leitura'),
         backgroundColor: Theme.of(context).colorScheme.secondary,
         centerTitle: true,
       ),
-      body: Container(
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                Obx(() {
-                  return SearchField(
-                    suggestions: _controller.lands
-                        .map((LandModel land) =>
-                            '${land.name!} (ID: ${land.id!})')
-                        .toList(),
-                    hint: "Selecione um Terreno",
-                    searchStyle: TextStyle(
-                      fontSize: 18,
-                      color: Colors.black.withOpacity(0.8),
-                    ),
-                    searchInputDecoration: InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
+      body: PageView(
+        controller: pc.value,
+        children: [
+          Container(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    Obx(() {
+                      return SearchField(
+                        controller: _controller.landEC,
+                        suggestions: _controller.waterConsumptions
+                            .map(
+                                (WaterConsumptionModel wc) => '${wc.landName!}')
+                            .toList(),
+                        hint: "Selecione um Terreno",
+                        searchStyle: TextStyle(
+                          fontSize: 18,
                           color: Colors.black.withOpacity(0.8),
                         ),
+                        searchInputDecoration: InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.black.withOpacity(0.8),
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.red),
+                          ),
+                        ),
+                        maxSuggestionsInViewPort: 5,
+                        itemHeight: 50,
+                        onTap: (value) {
+                          _controller.currentWaterConsumption = _controller
+                              .waterConsumptions
+                              .firstWhere((wc) => wc.landName == value);
+
+                          setState(() {
+                            _controller.lastReadEC.text = _controller
+                                .currentWaterConsumption.lastRead
+                                .toString();
+                          });
+                        },
+                      );
+                    }),
+                    SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
                       ),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _controller.lastReadEC,
+                              enabled: false,
+                              decoration: InputDecoration(
+                                labelText: 'Última leitura',
+                              ),
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: TextFormField(
+                              controller: _controller.currentReadEC,
+                              decoration: InputDecoration(
+                                labelText: 'Leitura atual',
+                              ),
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              onChanged: (value) {
+                                _controller.currentWaterConsumption
+                                    .currentRead = double.parse(value);
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    maxSuggestionsInViewPort: 5,
-                    itemHeight: 50,
-                    onTap: (x) {
-                      _controller.currentWaterConsumption.landId =
-                          int.parse(x!.split(' ').last.replaceAll(')', ''));
-                    },
-                  );
-                }),
-
-                // Obx(() {
-                // return DropdownSearch(
-                //   mode: Mode.MENU,
-                //   items: _controller.lands
-                //       .map((LandModel land) => land.name!)
-                //       .toList(),
-                //   label: "Selecione um Terreno",
-                //   onChanged: (land) {
-                //     // _controller.currentWaterConsumption.landId = land!.id;
-                //   },
-                // );
-                // }),
-                SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          enabled: false,
-                          decoration: InputDecoration(
-                            labelText: 'Última leitura',
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                        ),
+                    SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        child: Text('Salvar medição'),
+                        onPressed: () async {
+                          if (_controller.currentReadEC.text.trim() != '' &&
+                              _controller.landEC.text.trim() != '') {
+                            await _controller.saveWaterConsumptionOdoo(context);
+                          } else {
+                            Get.snackbar(
+                              'Falha ao Salvar',
+                              'Preencha todos os campos',
+                              colorText: Colors.white,
+                              backgroundColor: Colors.red,
+                              snackPosition: SnackPosition.BOTTOM,
+                              margin: const EdgeInsets.all(10),
+                            );
+                          }
+                        },
                       ),
-                      Expanded(
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Leitura atual',
-                          ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          onChanged: (value) {
-                            _controller.currentWaterConsumption.currentRead =
-                                double.parse(value);
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    child: Text('Salvar Medição'),
-                    onPressed: () async {
-                      _controller.isLoading.value = true;
-                      await _controller.saveWaterConsumption();
-                      _controller.isLoading.value = false;
-
-                      print(_controller.currentWaterConsumption.toJson());
-                      print(Provider.of<AuthController>(
-                        context,
-                        listen: false,
-                      ).currentUser.toJson());
-                    },
-                  ),
-                ),
-                SizedBox(height: 50),
-                Obx(() {
-                  return Visibility(
-                    visible: _controller.isLoading.value,
-                    child: CircularProgressIndicator(
-                      color: Theme.of(context).primaryColor,
                     ),
-                  );
-                }),
-              ],
+                    SizedBox(height: 50),
+                    Obx(() {
+                      return Visibility(
+                        visible: _controller.isLoading.value,
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+          ProfilePage(),
+        ],
       ),
     );
   }

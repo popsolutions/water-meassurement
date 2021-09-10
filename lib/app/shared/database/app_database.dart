@@ -24,13 +24,19 @@ class AppDatabase {
   }
 
   _onCreate(db, version) async {
-    await db.execute(_lands);
+    await db.execute(_waterConsumptions);
   }
 
-  String get _lands => ''' 
-  CREATE TABLE IF NOT EXISTS lands (
+  String get _waterConsumptions => ''' 
+  CREATE TABLE IF NOT EXISTS waterConsumption (
     id INT PRIMARY KEY,
-    name TEXT
+    land_id INT,
+    land_name TEXT,
+    date TEXT,
+    last_read REAL,
+    current_read REAL,
+    reader_id INT,
+    state TEXT
     );
   ''';
 }

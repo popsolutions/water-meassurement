@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:water_meassurement/app/modules/login/login_service.dart';
 import 'package:water_meassurement/app/shared/models/user_model.dart';
 

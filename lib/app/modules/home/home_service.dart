@@ -5,8 +5,9 @@ import 'package:water_meassurement/app/shared/models/water_consumption_model.dar
 
 class HomeService {
   Future<void> saveWaterConsumption(WaterConsumptionModel wc) async {
-    await odoo.create(
+    await odoo.write(
       AppConstants.waterConsumptionModel,
+      [wc.id!],
       wc.toMap(),
     );
   }
@@ -24,6 +25,31 @@ class HomeService {
 
     final List json = response.getRecords();
     final listMission = json.map((e) => LandModel.fromJson(e)).toList();
+
+    return listMission;
+  }
+
+  Future<List<WaterConsumptionModel>> getWaterConsumptions() async {
+    final response = await odoo.searchRead(
+      AppConstants.waterConsumptionModel,
+      [
+        ["state", "=", "draft"]
+      ],
+      [
+        "id",
+        "land_id",
+        "name",
+        "date",
+        "last_read",
+        "current_read",
+        "reader_id",
+        "state"
+      ],
+    );
+
+    final List json = response.getRecords();
+    final listMission =
+        json.map((e) => WaterConsumptionModel.fromJson(e)).toList();
 
     return listMission;
   }

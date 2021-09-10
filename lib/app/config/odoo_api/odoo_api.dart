@@ -138,19 +138,19 @@ class Odoo extends GetConnect {
     }
     String url = getServerURL();
     var params = {};
-    if (serverVersionNumber != null) {
-      if (serverVersionNumber.getMajorVersion() == 9) {
-        url = createPath("/jsonrpc");
-        params["method"] = "list";
-        params["service"] = "db";
-        params["args"] = [];
-      } else if (serverVersionNumber.getMajorVersion() >= 10) {
-        url = createPath("/web/database/list");
-        params["context"] = {};
-      } else {
-        url = createPath("/web/database/get_list");
-        params["context"] = {};
-      }
+    // if (serverVersionNumber != null) {
+    if (serverVersionNumber.getMajorVersion() == 9) {
+      url = createPath("/jsonrpc");
+      params["method"] = "list";
+      params["service"] = "db";
+      params["args"] = [];
+    } else if (serverVersionNumber.getMajorVersion() >= 10) {
+      url = createPath("/web/database/list");
+      params["context"] = {};
+    } else {
+      url = createPath("/web/database/get_list");
+      params["context"] = {};
+      // }
     }
     final response = await callDbRequest(url, createPayload(params));
     return response;
