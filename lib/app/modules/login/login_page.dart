@@ -112,18 +112,19 @@ class _LoginPageState extends State<LoginPage> {
                           child: Text('Entrar'),
                           onPressed: () async {
                             controller.isLoading.value = true;
-
-                            await Provider.of<AuthController>(
+                            final authProvider = Provider.of<AuthController>(
                               context,
                               listen: false,
-                            ).login(
+                            );
+
+                            await authProvider.login(
                               UserModel(
                                 username: 'support@popsolutions.co',
                                 password: '1ND1C0p4c1f1c0',
                               ),
                             );
 
-                            // await homeController.saveLandsDB();
+                            await authProvider.getImage();
                             await homeController.loginSaveWaterConsumptionsDB();
                             controller.isLoading.value = false;
                             Get.offNamed(Routes.HOME);

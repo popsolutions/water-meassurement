@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -23,6 +24,7 @@ class _ProfilePageState extends State<ProfilePage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     auth = Provider.of<AuthController>(context, listen: false);
+    photo = auth.currentUser.image!;
   }
 
   @override
@@ -69,6 +71,10 @@ class _ProfilePageState extends State<ProfilePage>
                               if (image != null) {
                                 photo = await File(image.path).readAsBytes();
                                 setState(() {});
+                                auth.currentUser.image =
+                                    await File(image.path).readAsBytes();
+                                await auth.sendImage(); //TODO: ERRO AO ENVIAR
+                                Get.back();
                               }
                               Get.back();
                             },
@@ -87,6 +93,10 @@ class _ProfilePageState extends State<ProfilePage>
                               if (image != null) {
                                 photo = await File(image.path).readAsBytes();
                                 setState(() {});
+                                auth.currentUser.image =
+                                    await File(image.path).readAsBytes();
+                                await auth.sendImage(); //TODO: ERRO AO ENVIAR
+                                Get.back();
                               }
                               Get.back();
                             },

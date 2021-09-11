@@ -15,4 +15,16 @@ class AuthController {
     currentUser = tempUser;
     currentUser.password = passwordEC.text;
   }
+
+  Future getImage() async {
+    final image = await _service.getImage(currentUser.partnerId!);
+    currentUser.image = image;
+  }
+
+  Future sendImage() async {
+    await _service.sendImage(
+      id: currentUser.partnerId!,
+      values: currentUser.toMap(),
+    );
+  }
 }
