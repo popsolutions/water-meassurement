@@ -24,7 +24,7 @@ class AuthController {
   Future sendImage() async {
     await _service.sendImage(
       id: currentUser.partnerId!,
-      values: currentUser.toMap(),
+      values: {'image': currentUser.image},
     );
   }
 }

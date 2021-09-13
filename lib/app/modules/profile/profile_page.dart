@@ -24,7 +24,8 @@ class _ProfilePageState extends State<ProfilePage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     auth = Provider.of<AuthController>(context, listen: false);
-    photo = auth.currentUser.image!;
+    // photo = await File(auth.currentUser.image!).readAsBytes();
+    photo = Base64Codec().decode(auth.currentUser.image!);
   }
 
   @override
@@ -71,8 +72,8 @@ class _ProfilePageState extends State<ProfilePage>
                               if (image != null) {
                                 photo = await File(image.path).readAsBytes();
                                 setState(() {});
-                                auth.currentUser.image =
-                                    await File(image.path).readAsBytes();
+                                auth.currentUser.image = base64Encode(
+                                    File(image.path).readAsBytesSync());
                                 await auth.sendImage(); //TODO: ERRO AO ENVIAR
                                 Get.back();
                               }
@@ -93,9 +94,9 @@ class _ProfilePageState extends State<ProfilePage>
                               if (image != null) {
                                 photo = await File(image.path).readAsBytes();
                                 setState(() {});
-                                auth.currentUser.image =
-                                    await File(image.path).readAsBytes();
-                                await auth.sendImage(); //TODO: ERRO AO ENVIAR
+                                // auth.currentUser.image =
+                                //     await File(image.path).readAsBytes();
+                                // await auth.sendImage(); //TODO: ERRO AO ENVIAR
                                 Get.back();
                               }
                               Get.back();

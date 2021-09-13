@@ -17,10 +17,10 @@ class LoginService extends GetxService {
       [
         ["id", "=", "$id"]
       ],
-      [],
+      ["image"],
     );
     final List list = auth.getRecords();
-    return Base64Codec().decode(list[0]['image']);
+    return list[0]['image'];
   }
 
   sendImage({required int id, required Map values}) async {

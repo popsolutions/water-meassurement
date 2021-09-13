@@ -1,12 +1,10 @@
 import 'dart:convert';
 
-import 'dart:typed_data';
-
 class UserModel {
   String? sessionId;
   int? uid;
   String? name;
-  Uint8List? image;
+  String? image;
   String? username;
   String? password;
   String? partnerDisplayName;
@@ -44,7 +42,6 @@ class UserModel {
       sessionId: map['session_id'],
       uid: map['uid'],
       name: map['name'],
-      image: map['image'],
       username: map['username'],
       password: map['password'],
       partnerDisplayName: map['partner_display_name'],
