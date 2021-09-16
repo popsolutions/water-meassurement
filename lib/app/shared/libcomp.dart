@@ -1,24 +1,20 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
 
 int dialogProcessIndex = 0;
 
-class LibComp{
-
-  static void showMessage(BuildContext context, String title, String message) async {
+class LibComp {
+  static void showMessage(
+      BuildContext context, String title, String message) async {
     if (Platform.isAndroid) {
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext ctxt) {
           return AlertDialog(
-            backgroundColor: Colors.white ,
+            backgroundColor: Colors.white,
             title: Text(
               title,
               style: TextStyle(

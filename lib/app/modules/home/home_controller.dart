@@ -58,7 +58,7 @@ class HomeController extends GetxController {
   Future<void> loginSaveWaterConsumptionsDB() async {
     final waterConsumptionsApi = await _service.getWaterConsumptions();
     final waterConsumptionsDao = await _dao.getWaterConsumptionsDao();
-    if (await waterConsumptionsDao.isEmpty) {
+    if (waterConsumptionsDao.isEmpty) {
       await _dao.saveWaterConsumptionsDaoList(waterConsumptionsApi);
     }
   }
@@ -82,11 +82,13 @@ class HomeController extends GetxController {
       String waterConsumptionIgnore = '';
 
       while (true) {
-        WaterConsumptionModel? waterConsumptionModel = await _dao.getNextSendOdooWaterConsumptionModel(waterConsumptionIgnore);
+        WaterConsumptionModel? waterConsumptionModel = await _dao
+            .getNextSendOdooWaterConsumptionModel(waterConsumptionIgnore);
         int? loteProcess = 0;
 
-        Future<void> logInsert(int typelog, [String? logText = null]) async {
-          int? id = await _dao.waterLogInsert(waterConsumptionModel?.id, typelog, loteProcess, logText);
+        Future<void> logInsert(int typelog, [String? logText]) async {
+          int? id = await _dao.waterLogInsert(
+              waterConsumptionModel?.id, typelog, loteProcess, logText);
 
           if (loteProcess == 0) loteProcess = id;
         }
@@ -94,27 +96,31 @@ class HomeController extends GetxController {
         if (waterConsumptionModel == null) break;
 
         try {
-          await logInsert(typeLogEnum.processWaterSend_1, 'currentRead: ' + waterConsumptionModel.currentRead.toString());
+          await logInsert(TypeLogEnum.processWaterSend_1,
+              'currentRead: ' + waterConsumptionModel.currentRead.toString());
           waterConsumptionModel.statesendserver = StateSendServerEnum.sending_3;
           await _dao.updateWaterConsumptionsDao(waterConsumptionModel);
-          await logInsert(typeLogEnum.DaoToStateSend_2);
+          await logInsert(TypeLogEnum.DaoToStateSend_2);
 
           waterConsumptionModel.state = 'draft';
           await _service.saveWaterConsumptionOdoo(waterConsumptionModel);
-          await logInsert(typeLogEnum.SendDraftToOdoo_3);
+          await logInsert(TypeLogEnum.SendDraftToOdoo_3);
 
           waterConsumptionModel.state = 'pending';
           await _service.saveWaterConsumptionOdoo(waterConsumptionModel);
-          await logInsert(typeLogEnum.SendPendingToOdoo_4);
+          await logInsert(TypeLogEnum.SendPendingToOdoo_4);
 
           waterConsumptionModel.statesendserver = StateSendServerEnum.send_5;
-          waterConsumptionModel.datetime_send = DateTime.now();
+          waterConsumptionModel.datetimeSend = DateTime.now();
           await _dao.updateWaterConsumptionsDao(waterConsumptionModel);
-          await logInsert(typeLogEnum.SendDaoToStateSend_5);
+          await logInsert(TypeLogEnum.SendDaoToStateSend_5);
         } catch (e) {
-          waterConsumptionIgnore = (waterConsumptionIgnore == '') ? '0' : waterConsumptionModel.id.toString();
-          await logInsert(typeLogEnum.processWaterError_6, e.toString());
-          waterConsumptionModel.statesendserver = StateSendServerEnum.sendingError_4;
+          waterConsumptionIgnore = (waterConsumptionIgnore == '')
+              ? '0'
+              : waterConsumptionModel.id.toString();
+          await logInsert(TypeLogEnum.processWaterError_6, e.toString());
+          waterConsumptionModel.statesendserver =
+              StateSendServerEnum.sendingError_4;
           await _dao.updateWaterConsumptionsDao(waterConsumptionModel);
         }
         setAmount();

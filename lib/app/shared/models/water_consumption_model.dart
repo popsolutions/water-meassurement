@@ -12,7 +12,7 @@ class WaterConsumptionModel {
   int? readerId;
   String? state;
   int? statesendserver; //StateSendServerEnum
-  DateTime? datetime_send;
+  DateTime? datetimeSend;
 
   WaterConsumptionModel({
     this.id,
@@ -24,7 +24,7 @@ class WaterConsumptionModel {
     this.readerId,
     this.state = 'draft',
     this.statesendserver = StateSendServerEnum.unread_1,
-    this.datetime_send
+    this.datetimeSend
   });
 
   Map<String, dynamic> toMap() {
@@ -51,7 +51,7 @@ class WaterConsumptionModel {
       'reader_id': readerId,
       'state': state,
       'statesendserver': statesendserver,
-      'datetime_send': datetime_send.toString()
+      'datetime_send': datetimeSend.toString()
     };
   }
 
@@ -79,7 +79,7 @@ class WaterConsumptionModel {
       readerId: map['reader_id'],
       state: map['state'],
       statesendserver: map['statesendserver'],
-      datetime_send: (map['datetime_send'] == 'null') ? null : DateTime.parse(map['datetime_send']),
+      datetimeSend: (map['datetime_send'] == 'null') ? null : DateTime.parse(map['datetime_send']),
     );
   }
 

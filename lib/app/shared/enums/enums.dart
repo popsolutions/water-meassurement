@@ -30,7 +30,7 @@ class StateSendServerEnum{
   }
 }
 
-class typeLogEnum{
+class TypeLogEnum{
   static const int processWaterSend_1 = 1;
   static const int DaoToStateSend_2 = 2;
   static const int SendDraftToOdoo_3 = 3;
