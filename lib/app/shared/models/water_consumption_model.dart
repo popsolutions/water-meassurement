@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:water_meassurement/app/shared/enums/enums.dart';
+
 class WaterConsumptionModel {
   int? landId;
   String? landName;
@@ -9,6 +11,8 @@ class WaterConsumptionModel {
   double? currentRead;
   int? readerId;
   String? state;
+  int? statesendserver; //StateSendServerEnum
+  DateTime? datetime_send;
 
   WaterConsumptionModel({
     this.id,
@@ -19,6 +23,8 @@ class WaterConsumptionModel {
     this.currentRead,
     this.readerId,
     this.state = 'draft',
+    this.statesendserver = StateSendServerEnum.unread_1,
+    this.datetime_send
   });
 
   Map<String, dynamic> toMap() {
@@ -31,6 +37,21 @@ class WaterConsumptionModel {
       'current_read': currentRead,
       'reader_id': readerId,
       'state': state,
+    };
+  }
+
+  Map<String, dynamic> toMapDao() {
+    return {
+      'id': id,
+      'land_id': landId,
+      'land_name': landName,
+      'date': date,
+      'last_read': lastRead,
+      'current_read': currentRead,
+      'reader_id': readerId,
+      'state': state,
+      'statesendserver': statesendserver,
+      'datetime_send': datetime_send.toString()
     };
   }
 
@@ -57,6 +78,8 @@ class WaterConsumptionModel {
       currentRead: map['current_read'],
       readerId: map['reader_id'],
       state: map['state'],
+      statesendserver: map['statesendserver'],
+      datetime_send: (map['datetime_send'] == 'null') ? null : DateTime.parse(map['datetime_send']),
     );
   }
 
@@ -64,4 +87,6 @@ class WaterConsumptionModel {
 
   factory WaterConsumptionModel.fromJson(dynamic source) =>
       WaterConsumptionModel.fromMap(source);
+
+  get statesendserverText => StateSendServerEnum.convertIntToText(this.statesendserver);
 }

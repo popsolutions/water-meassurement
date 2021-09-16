@@ -25,6 +25,7 @@ class AppDatabase {
 
   _onCreate(db, version) async {
     await db.execute(_waterConsumptions);
+    await db.execute(_waterLog);
   }
 
   String get _waterConsumptions => ''' 
@@ -36,7 +37,23 @@ class AppDatabase {
     last_read REAL,
     current_read REAL,
     reader_id INT,
-    state TEXT
+    state TEXT,
+    statesendserver int,
+    datetime_send timestamp
     );
+    
+    CREATE INDEX indx_waterConsumption_statesendserver ON waterConsumption (statesendserver);
+  ''';
+
+  String get _waterLog => ''' 
+  CREATE TABLE IF NOT EXISTS waterLog (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    loteprocess int,
+    waterconsumption_id int,
+    typelog INT,
+    logText TEXT,
+    datetime timestamp,
+    FOREIGN KEY(waterconsumption_id) REFERENCES waterConsumption(id)
+  );
   ''';
 }

@@ -197,11 +197,17 @@ class Odoo extends GetConnect {
     });
     print("------------------------------------------->>>>");
     final response = await post(url, body, headers: _headers);
-    _updateCookies(response);
-    print("<<<<============================================");
-    print("RESPONSE: ${response.body}");
-    print("<<<<============================================");
-    return response;
+
+    if (response.body == null){
+      throw 'Odoo Conection error Url';
+    } else {
+      _updateCookies(response);
+      print("<<<<============================================");
+      print("RESPONSE: ${response.body}");
+      print("<<<<============================================");
+
+      return response;
+    }
   }
 
   _updateCookies(response) async {

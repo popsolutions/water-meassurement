@@ -4,7 +4,7 @@ import 'package:water_meassurement/app/shared/models/land_model.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 
 class HomeService {
-  Future<void> saveWaterConsumption(WaterConsumptionModel wc) async {
+  Future<void> saveWaterConsumptionOdoo(WaterConsumptionModel wc) async {
     await odoo.write(
       AppConstants.waterConsumptionModel,
       [wc.id!],

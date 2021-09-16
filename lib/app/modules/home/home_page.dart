@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:searchfield/searchfield.dart';
+import 'package:water_meassurement/app/config/odoo_api/odoo_api.dart';
+import 'package:water_meassurement/app/modules/home/home_service.dart';
 import 'package:water_meassurement/app/modules/profile/profile_page.dart';
+import 'package:water_meassurement/app/modules/shared/libcomp.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 import 'home_controller.dart';
+import 'package:collection/collection.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -73,12 +77,16 @@ class _HomePageState extends State<HomePage>
                             onTap: (value) {
                               _controller.currentWaterConsumption = _controller
                                   .waterConsumptions
-                                  .firstWhere((wc) => wc.landName == value);
+                                  .firstWhere((wc) => wc.landName == value); //.t. tratar null import 'package:collection/collection.dart'; firstWhereOrElseNull
 
                               setState(() {
                                 _controller.lastReadEC.text = _controller
                                     .currentWaterConsumption.lastRead
                                     .toString();
+                                if ( _controller.currentWaterConsumption.currentRead == 0)
+                                  _controller.currentReadEC.clear();
+                                else
+                                  _controller.currentReadEC.text = _controller.currentWaterConsumption.currentRead.toString();
                               });
                             },
                           ),
@@ -128,12 +136,19 @@ class _HomePageState extends State<HomePage>
                         child: ElevatedButton(
                           child: Text('Salvar medição'),
                           onPressed: () async {
-                            if (_controller.currentReadEC.text
-                                    .trim()
-                                    .isNotEmpty &&
-                                _controller.landEC.text.trim().isNotEmpty) {
-                              await _controller
-                                  .saveWaterConsumptionOdoo(context);
+                            _controller.currentWaterConsumption.currentRead = double.parse(_controller.currentReadEC.text);
+
+                            if (_controller.currentReadEC.text.trim().isNotEmpty &&
+                                _controller.landEC.text.trim().isNotEmpty &&
+                                (_controller.currentWaterConsumption.currentRead! > 0) &&
+                                (_controller.currentWaterConsumption.landName == _controller.landEC.text)) {
+                              try {
+                                await _controller
+                                  .saveWaterConsumptionDao(context);
+                                _controller.currentReadEC.clear();
+                              } catch (e) {
+                                LibComp.showMessage(context, 'Falha ao efetuar leitura', e.toString());
+                              }
                             } else {
                               Get.snackbar(
                                 'Falha ao Salvar',
@@ -156,6 +171,36 @@ class _HomePageState extends State<HomePage>
                           ),
                         );
                       }),
+                      Obx(() {
+                        return
+                      Container(
+                        child: Row(children: [
+                          Flexible(
+                            flex: 1,
+                              child: Row(
+                            children: [
+                              Text('Ler: '),
+                              Text(_controller.amountToRead.string, style: TextStyle(color: Colors.green)),
+                            ],
+                          )),
+                          Flexible(
+                              flex: 1,
+                              child: Row(
+                                children: [
+                                  Text('a enviar: '),
+                                  Text(_controller.amountToSend.string, style: TextStyle(color: Colors.red)),
+                                ],
+                              )),
+                          Flexible(
+                              flex: 1,
+                              child: Row(
+                                children: [
+                                  Text('Enviadas: '),
+                                  Text(_controller.amountSend.string, style: TextStyle(color: Colors.blueAccent)),
+                                ],
+                              ))
+                        ]),
+                      );})
                     ],
                   ),
                 ),
