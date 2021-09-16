@@ -15,8 +15,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with AutomaticKeepAliveClientMixin<HomePage> {
+class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<HomePage> {
   final HomeController _controller = Get.find();
   final pc = PageController(initialPage: 0);
 
@@ -63,10 +62,7 @@ class _HomePageState extends State<HomePage>
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: SearchField(
                             controller: _controller.landEC,
-                            suggestions: _controller.waterConsumptions
-                                .map((WaterConsumptionModel wc) =>
-                                    '${wc.landName!}')
-                                .toList(),
+                            suggestions: _controller.waterConsumptions.map((WaterConsumptionModel wc) => '${wc.landName!}').toList(),
                             hint: "Selecione um Terreno",
                             searchStyle: TextStyle(
                               fontSize: 18,
@@ -75,15 +71,12 @@ class _HomePageState extends State<HomePage>
                             maxSuggestionsInViewPort: 5,
                             itemHeight: 50,
                             onTap: (value) {
-                              _controller.currentWaterConsumption = _controller
-                                  .waterConsumptions
-                                  .firstWhere((wc) => wc.landName == value); //.t. tratar null import 'package:collection/collection.dart'; firstWhereOrElseNull
+                              _controller.currentWaterConsumption = _controller.waterConsumptions.firstWhere((wc) =>
+                                  wc.landName == value); //.t. tratar null import 'package:collection/collection.dart'; firstWhereOrElseNull
 
                               setState(() {
-                                _controller.lastReadEC.text = _controller
-                                    .currentWaterConsumption.lastRead
-                                    .toString();
-                                if ( _controller.currentWaterConsumption.currentRead == 0)
+                                _controller.lastReadEC.text = _controller.currentWaterConsumption.lastRead.toString();
+                                if (_controller.currentWaterConsumption.currentRead == 0)
                                   _controller.currentReadEC.clear();
                                 else
                                   _controller.currentReadEC.text = _controller.currentWaterConsumption.currentRead.toString();
@@ -105,9 +98,7 @@ class _HomePageState extends State<HomePage>
                                   labelText: 'Última leitura',
                                 ),
                                 keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                               ),
                             ),
                             SizedBox(width: 15),
@@ -118,12 +109,9 @@ class _HomePageState extends State<HomePage>
                                   labelText: 'Leitura atual',
                                 ),
                                 keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                 onChanged: (value) {
-                                  _controller.currentWaterConsumption
-                                      .currentRead = double.parse(value);
+                                  _controller.currentWaterConsumption.currentRead = double.parse(value);
                                 },
                               ),
                             ),
@@ -143,8 +131,7 @@ class _HomePageState extends State<HomePage>
                                 (_controller.currentWaterConsumption.currentRead! > 0) &&
                                 (_controller.currentWaterConsumption.landName == _controller.landEC.text)) {
                               try {
-                                await _controller
-                                  .saveWaterConsumptionDao(context);
+                                await _controller.saveWaterConsumptionDao(context);
                                 _controller.currentReadEC.clear();
                               } catch (e) {
                                 LibComp.showMessage(context, 'Falha ao efetuar leitura', e.toString());
@@ -172,35 +159,35 @@ class _HomePageState extends State<HomePage>
                         );
                       }),
                       Obx(() {
-                        return
-                      Container(
-                        child: Row(children: [
-                          Flexible(
-                            flex: 1,
-                              child: Row(
-                            children: [
-                              Text('Ler: '),
-                              Text(_controller.amountToRead.string, style: TextStyle(color: Colors.green)),
-                            ],
-                          )),
-                          Flexible(
-                              flex: 1,
-                              child: Row(
-                                children: [
-                                  Text('a enviar: '),
-                                  Text(_controller.amountToSend.string, style: TextStyle(color: Colors.red)),
-                                ],
-                              )),
-                          Flexible(
-                              flex: 1,
-                              child: Row(
-                                children: [
-                                  Text('Enviadas: '),
-                                  Text(_controller.amountSend.string, style: TextStyle(color: Colors.blueAccent)),
-                                ],
-                              ))
-                        ]),
-                      );})
+                        return Container(
+                          child: Row(children: [
+                            Flexible(
+                                flex: 1,
+                                child: Row(
+                                  children: [
+                                    Text('Ler: '),
+                                    Text(_controller.amountToRead.string, style: TextStyle(color: Colors.green)),
+                                  ],
+                                )),
+                            Flexible(
+                                flex: 1,
+                                child: Row(
+                                  children: [
+                                    Text('a enviar: '),
+                                    Text(_controller.amountToSend.string, style: TextStyle(color: Colors.red)),
+                                  ],
+                                )),
+                            Flexible(
+                                flex: 1,
+                                child: Row(
+                                  children: [
+                                    Text('Enviadas: '),
+                                    Text(_controller.amountSend.string, style: TextStyle(color: Colors.blueAccent)),
+                                  ],
+                                ))
+                          ]),
+                        );
+                      })
                     ],
                   ),
                 ),
