@@ -74,7 +74,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 setState(() {});
                                 auth.currentUser.image = base64Encode(
                                     File(image.path).readAsBytesSync());
-                                await auth.sendImage(); //TODO: ERRO AO ENVIAR
+                                await auth.sendImage();
                                 Get.back();
                               }
                               Get.back();
@@ -94,9 +94,9 @@ class _ProfilePageState extends State<ProfilePage>
                               if (image != null) {
                                 photo = await File(image.path).readAsBytes();
                                 setState(() {});
-                                // auth.currentUser.image =
-                                //     await File(image.path).readAsBytes();
-                                // await auth.sendImage(); //TODO: ERRO AO ENVIAR
+                                auth.currentUser.image = base64Encode(
+                                    File(image.path).readAsBytesSync());
+                                await auth.sendImage();
                                 Get.back();
                               }
                               Get.back();

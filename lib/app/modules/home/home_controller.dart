@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 import 'package:water_meassurement/app/modules/home/home_service.dart';
@@ -35,7 +36,6 @@ class HomeController extends GetxController {
   @override
   onInit() async {
     super.onInit();
-
     await getWaterConsumptionsDB();
   }
 
@@ -129,7 +129,9 @@ class HomeController extends GetxController {
   }
 
   Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
     await _dao.logout();
+    await prefs.clear();
     Get.offAllNamed(Routes.LOGIN);
   }
 

@@ -42,6 +42,7 @@ class UserModel {
       sessionId: map['session_id'],
       uid: map['uid'],
       name: map['name'],
+      image: map['image'],
       username: map['username'],
       password: map['password'],
       partnerDisplayName: map['partner_display_name'],
