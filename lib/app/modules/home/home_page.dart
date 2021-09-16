@@ -158,6 +158,28 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                           ),
                         );
                       }),
+                      Container(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          child: Text('Reload'),
+                          onPressed: () async {
+                            final HomeController homeController = Get.find();
+                            final _homeService = Get.put(HomeService());
+
+                            List<WaterConsumptionModel> listWaterConsumptionModel = _controller.waterConsumptions.value;
+
+                            for (WaterConsumptionModel element in listWaterConsumptionModel) {
+                              element.state = 'draft';
+                              element.currentRead = 0;
+                              await _homeService.saveWaterConsumptionOdoo(element);
+                            }
+
+                            await homeController.clearWaterConsumptionsDao();
+                            await homeController.loginSaveWaterConsumptionsDB();
+                            await homeController.getWaterConsumptionsDB();
+                          },
+                        ),
+                      ),
                       Obx(() {
                         return Container(
                           child: Row(children: [
