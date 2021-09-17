@@ -1,6 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:water_meassurement/app/shared/utils/constants.dart';
+import 'package:water_meassurement/app/config/app_constants.dart';
 
 class AppDatabase {
   AppDatabase._();
@@ -17,7 +17,7 @@ class AppDatabase {
 
   _initDatabase() async {
     return await openDatabase(
-      join(await getDatabasesPath(), Constants.DB_NAME),
+      join(await getDatabasesPath(), AppConstants.DB_NAME),
       version: 1,
       onCreate: _onCreate,
     );

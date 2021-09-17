@@ -6,10 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 import 'package:water_meassurement/app/modules/home/home_service.dart';
+import 'package:water_meassurement/app/shared/data/dao/water_consumption_dao.dart';
 import 'package:water_meassurement/app/shared/enums/enums.dart';
 import 'package:water_meassurement/app/shared/models/land_model.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
-import 'dao/water_consumption_dao.dart';
 
 class HomeController extends GetxController {
   final HomeService _service;

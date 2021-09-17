@@ -1,5 +1,5 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:water_meassurement/app/shared/database/app_database.dart';
+import 'package:water_meassurement/app/shared/data/database/app_database.dart';
 import 'package:water_meassurement/app/shared/enums/enums.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 
@@ -61,11 +61,13 @@ class WaterConsumptionDao {
         where: 'statesendserver = ${StateSendServerEnum.read_2}', limit: 1);
 
     if (waterConsumptiosDao.length == 0)
-      waterConsumptiosDao = await _db.query('waterConsumption',
-          where:
-              'statesendserver in (${StateSendServerEnum.sending_3}, ${StateSendServerEnum.sendingError_4}) $waterConsumptionIgnore',
-          orderBy: 'id',
-          limit: 1);
+      waterConsumptiosDao = await _db.query(
+        'waterConsumption',
+        where:
+            'statesendserver in (${StateSendServerEnum.sending_3}, ${StateSendServerEnum.sendingError_4}) $waterConsumptionIgnore',
+        orderBy: 'id',
+        limit: 1,
+      );
 
     if (waterConsumptiosDao.length == 0) return null;
 
@@ -76,7 +78,7 @@ class WaterConsumptionDao {
 
   Future<void> logout() async {
     _db = await AppDatabase.instance.database;
-    // await _db.delete('waterConsumption'); //*. Pedro, creio que não seja necessário excluir waterConsumption quando fazer logout
+    // await _db.delete('waterConsumption');
   }
 
   Future<int?> waterLogInsert(int? waterConsumptionId, int? typelog,

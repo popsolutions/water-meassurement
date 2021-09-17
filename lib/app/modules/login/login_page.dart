@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:water_meassurement/app/config/app_constants.dart';
 import 'package:water_meassurement/app/config/app_images.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
@@ -134,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                             await homeController.loginSaveWaterConsumptionsDB();
                             final prefs = await SharedPreferences.getInstance();
                             prefs.setString(
-                              'currentUser',
+                              AppConstants.CURRENT_USER_SHARED_PREFS,
                               authProvider.currentUser.toJson(),
                             );
                             controller.isLoading.value = false;
