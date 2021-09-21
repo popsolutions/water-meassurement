@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
+import 'package:water_meassurement/app/config/app_routes.dart';
 import 'odoo_response.dart';
 import 'odoo_version.dart';
 
@@ -178,8 +179,12 @@ class Odoo extends GetConnect {
     OdooResponse odooResponse =
         new OdooResponse(response.body, response.statusCode);
 
-    if (odooResponse.hasError())
+    if (odooResponse.hasError()) {
+      if (odooResponse.getErrorMessage() == 'session expired') {
+        Get.offAllNamed(Routes.LOGIN);
+      }
       throw odooResponse.getErrorMessage().toString();
+    }
 
     return odooResponse;
   }
@@ -198,7 +203,7 @@ class Odoo extends GetConnect {
     print("------------------------------------------->>>>");
     final response = await post(url, body, headers: _headers);
 
-    if (response.body == null){
+    if (response.body == null) {
       throw 'Odoo Conection error Url';
     } else {
       _updateCookies(response);

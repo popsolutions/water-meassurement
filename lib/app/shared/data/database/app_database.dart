@@ -34,6 +34,7 @@ class AppDatabase {
     land_id INT,
     land_name TEXT,
     date TEXT,
+    photo TEXT,
     last_read REAL,
     current_read REAL,
     reader_id INT,

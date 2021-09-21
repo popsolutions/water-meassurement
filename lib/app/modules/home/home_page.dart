@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:searchfield/searchfield.dart';
+import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 import 'package:water_meassurement/app/modules/profile/profile_page.dart';
 import 'package:water_meassurement/app/shared/libcomp.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
@@ -16,7 +21,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin<HomePage> {
   final HomeController _controller = Get.find();
+  final AuthController auth = Get.find();
+
   final pc = PageController(initialPage: 0);
+  Uint8List? photo;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.processListSendsWaterConsumptionOdoo();
+  }
 
   @override
   void dispose() {
@@ -42,6 +56,16 @@ class _HomePageState extends State<HomePage>
           }),
           backgroundColor: Theme.of(context).colorScheme.secondary,
           centerTitle: true,
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.sync,
+              ),
+              onPressed: () async {
+                _controller.processListSendsWaterConsumptionOdoo();
+              },
+            ),
+          ],
         ),
         body: PageView(
           controller: pc,
@@ -135,14 +159,48 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: photo == null
+                            ? () async {
+                                final ImagePicker _picker = ImagePicker();
+                                final XFile? image = await _picker.pickImage(
+                                  source: ImageSource.camera,
+                                );
+                                if (image != null) {
+                                  photo = await File(image.path).readAsBytes();
+                                  _controller.currentWaterConsumption.photo =
+                                      base64Encode(
+                                          File(image.path).readAsBytesSync());
+                                  setState(() {});
+                                }
+                              }
+                            : null,
+                        child: Container(
+                          width: 150,
+                          height: 200,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF0F5F7),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: photo == null
+                              ? Center(
+                                  child: Text(
+                                  'Tire uma foto',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontFamily: 'Roboto',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ))
+                              : Image.memory(photo!, fit: BoxFit.cover),
+                        ),
+                      ),
+                      SizedBox(height: 10),
                       Container(
                         width: double.infinity,
                         child: ElevatedButton(
                           child: Text('Salvar medição'),
                           onPressed: () async {
-                            _controller.currentWaterConsumption.currentRead =
-                                double.parse(_controller.currentReadEC.text);
-
                             if (_controller.currentReadEC.text
                                     .trim()
                                     .isNotEmpty &&
@@ -153,9 +211,18 @@ class _HomePageState extends State<HomePage>
                                 (_controller.currentWaterConsumption.landName ==
                                     _controller.landEC.text)) {
                               try {
+                                _controller
+                                        .currentWaterConsumption.currentRead =
+                                    double.parse(
+                                        _controller.currentReadEC.text);
                                 await _controller
                                     .saveWaterConsumptionDao(context);
                                 _controller.currentReadEC.clear();
+                                _controller.lastReadEC.clear();
+                                _controller.landEC.clear();
+                                setState(() {
+                                  photo = null;
+                                });
                               } catch (e) {
                                 LibComp.showMessage(context,
                                     'Falha ao efetuar leitura', e.toString());

@@ -24,7 +24,6 @@ class _ProfilePageState extends State<ProfilePage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     auth = Provider.of<AuthController>(context, listen: false);
-    // photo = await File(auth.currentUser.image!).readAsBytes();
     photo = Base64Codec().decode(auth.currentUser.image!);
   }
 

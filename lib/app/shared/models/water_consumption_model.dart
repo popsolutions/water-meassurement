@@ -7,6 +7,7 @@ class WaterConsumptionModel {
   String? landName;
   int? id;
   String? date;
+  String? photo;
   double? lastRead;
   double? currentRead;
   int? readerId;
@@ -19,12 +20,13 @@ class WaterConsumptionModel {
     this.landId,
     this.landName,
     this.date,
+    this.photo,
     this.lastRead,
     this.currentRead,
     this.readerId,
     this.state = 'draft',
     this.statesendserver = StateSendServerEnum.unread_1,
-    this.datetimeSend
+    this.datetimeSend,
   });
 
   Map<String, dynamic> toMap() {
@@ -33,6 +35,7 @@ class WaterConsumptionModel {
       'land_id': landId,
       'land_name': landName,
       'date': date,
+      'photo': photo,
       'last_read': lastRead,
       'current_read': currentRead,
       'reader_id': readerId,
@@ -46,6 +49,7 @@ class WaterConsumptionModel {
       'land_id': landId,
       'land_name': landName,
       'date': date,
+      'photo': photo,
       'last_read': lastRead,
       'current_read': currentRead,
       'reader_id': readerId,
@@ -61,6 +65,7 @@ class WaterConsumptionModel {
       landId: map['land_id'][0],
       landName: map['land_id'][1],
       date: map['date'],
+      photo: map['photo'],
       lastRead: double.parse(map['last_read'].toString()),
       currentRead: double.parse(map['current_read'].toString()),
       readerId: (map['reader_id'] is bool ? 0 : map['reader_id'][0]),
@@ -74,12 +79,15 @@ class WaterConsumptionModel {
       landId: map['land_id'],
       landName: map['land_name'],
       date: map['date'],
+      photo: map['photo'],
       lastRead: map['last_read'],
       currentRead: map['current_read'],
       readerId: map['reader_id'],
       state: map['state'],
       statesendserver: map['statesendserver'],
-      datetimeSend: (map['datetime_send'] == 'null') ? null : DateTime.parse(map['datetime_send']),
+      datetimeSend: (map['datetime_send'] == 'null')
+          ? null
+          : DateTime.parse(map['datetime_send']),
     );
   }
 
@@ -88,5 +96,6 @@ class WaterConsumptionModel {
   factory WaterConsumptionModel.fromJson(dynamic source) =>
       WaterConsumptionModel.fromMap(source);
 
-  get statesendserverText => StateSendServerEnum.convertIntToText(this.statesendserver);
+  get statesendserverText =>
+      StateSendServerEnum.convertIntToText(this.statesendserver);
 }
