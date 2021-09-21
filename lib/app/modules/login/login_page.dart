@@ -126,8 +126,8 @@ class _LoginPageState extends State<LoginPage> {
 
                             await authProvider.login(
                               UserModel(
-                                username: 'support@popsolutions.co',
-                                password: '1ND1C0p4c1f1c0',
+                                username: auth.emailEC.text,
+                                password: auth.passwordEC.text,
                               ),
                             );
 
