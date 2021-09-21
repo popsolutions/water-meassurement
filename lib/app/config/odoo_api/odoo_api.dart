@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
 import 'odoo_response.dart';
@@ -180,7 +181,9 @@ class Odoo extends GetConnect {
         new OdooResponse(response.body, response.statusCode);
 
     if (odooResponse.hasError()) {
-      if (odooResponse.getErrorMessage() == 'session expired') {
+      if (odooResponse.getErrorMessage() == 'Session expired') {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
         Get.offAllNamed(Routes.LOGIN);
       }
       throw odooResponse.getErrorMessage().toString();
