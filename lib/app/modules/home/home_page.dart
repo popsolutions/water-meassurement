@@ -57,14 +57,19 @@ class _HomePageState extends State<HomePage>
           backgroundColor: Theme.of(context).colorScheme.secondary,
           centerTitle: true,
           actions: [
-            IconButton(
-              icon: Icon(
-                Icons.sync,
-              ),
-              onPressed: () async {
-                _controller.processListSendsWaterConsumptionOdoo();
-              },
-            ),
+            Obx(() {
+              return Visibility(
+                visible: _controller.index.value == 0,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.sync,
+                  ),
+                  onPressed: () async {
+                    _controller.processListSendsWaterConsumptionOdoo();
+                  },
+                ),
+              );
+            })
           ],
         ),
         body: PageView(
@@ -160,21 +165,19 @@ class _HomePageState extends State<HomePage>
                       ),
                       SizedBox(height: 10),
                       GestureDetector(
-                        onTap: photo == null
-                            ? () async {
-                                final ImagePicker _picker = ImagePicker();
-                                final XFile? image = await _picker.pickImage(
-                                  source: ImageSource.camera,
-                                );
-                                if (image != null) {
-                                  photo = await File(image.path).readAsBytes();
-                                  _controller.currentWaterConsumption.photo =
-                                      base64Encode(
-                                          File(image.path).readAsBytesSync());
-                                  setState(() {});
-                                }
-                              }
-                            : null,
+                        onTap: () async {
+                          final ImagePicker _picker = ImagePicker();
+                          final XFile? image = await _picker.pickImage(
+                            source: ImageSource.camera,
+                          );
+                          if (image != null) {
+                            photo = await File(image.path).readAsBytes();
+                            _controller.currentWaterConsumption.photo =
+                                base64Encode(
+                                    File(image.path).readAsBytesSync());
+                            setState(() {});
+                          }
+                        },
                         child: Container(
                           width: 150,
                           height: 200,
@@ -197,9 +200,11 @@ class _HomePageState extends State<HomePage>
                       ),
                       SizedBox(height: 10),
                       Container(
+                        height: 50,
                         width: double.infinity,
                         child: ElevatedButton(
-                          child: Text('Salvar medição'),
+                          child: Text('Salvar medição',
+                              style: TextStyle(fontSize: 20)),
                           onPressed: () async {
                             if (_controller.currentReadEC.text
                                     .trim()

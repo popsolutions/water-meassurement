@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -184,6 +185,15 @@ class Odoo extends GetConnect {
       if (odooResponse.getErrorMessage() == 'Session expired') {
         final prefs = await SharedPreferences.getInstance();
         await prefs.clear();
+        Get.snackbar(
+          'Sessão expirou!',
+          'Faça login novamente.',
+          colorText: Colors.white,
+          backgroundColor: Colors.red,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(10),
+        );
+        await Future.delayed(Duration(seconds: 2));
         Get.offAllNamed(Routes.LOGIN);
       }
       throw odooResponse.getErrorMessage().toString();
