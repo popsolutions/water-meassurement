@@ -106,8 +106,7 @@ class HomeController extends GetxController {
           await _service.saveWaterConsumptionOdoo(waterConsumptionModel);
           await logInsert(TypeLogEnum.SendDraftToOdoo_3);
 
-          waterConsumptionModel.state = 'pending';
-          await _service.saveWaterConsumptionOdoo(waterConsumptionModel);
+          await _service.saveWaterConsumptionOdooToPending(waterConsumptionModel);
           await logInsert(TypeLogEnum.SendPendingToOdoo_4);
 
           waterConsumptionModel.statesendserver = StateSendServerEnum.send_5;
@@ -143,8 +142,8 @@ class HomeController extends GetxController {
 
   setAmount() async {
     dynamic response = await _dao.getWaterConsumptionAmounts();
-    amountToRead.value = response[0]['amountToRead'];
-    amountToSend.value = response[0]['amountToSend'];
-    amountSend.value = response[0]['amountSend'];
+    amountToRead.value = response[0]['amountToRead'] ?? 0;
+    amountToSend.value = response[0]['amountToSend'] ?? 0;
+    amountSend.value = response[0]['amountSend'] ?? 0;
   }
 }

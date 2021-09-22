@@ -12,6 +12,16 @@ class HomeService {
     );
   }
 
+  Future<void> saveWaterConsumptionOdooToPending(WaterConsumptionModel wc) async {
+    wc.state = 'pending';
+
+    await odoo.write(
+      AppConstants.waterConsumptionModel,
+      [wc.id!],
+      {"state": 'pending'},
+    );
+  }
+
   Future<void> readWaterConsumption() async {
     await odoo.searchRead(AppConstants.waterConsumptionModel, [], []);
   }
