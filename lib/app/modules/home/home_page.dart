@@ -61,11 +61,12 @@ class _HomePageState extends State<HomePage>
               return Visibility(
                 visible: _controller.index.value == 0,
                 child: IconButton(
-                  icon: Icon(
-                    Icons.sync,
-                  ),
+                  icon: Icon(Icons.sync),
                   onPressed: () async {
-                    _controller.processListSendsWaterConsumptionOdoo();
+                    if (_controller.amountToSend.value != 0) {
+                      await _controller
+                          .processListSendsWaterConsumptionOdoo(); //TODO: REVER
+                    }
                   },
                 ),
               );
@@ -74,8 +75,8 @@ class _HomePageState extends State<HomePage>
         ),
         body: PageView(
           controller: pc,
-          onPageChanged: (int page) {
-            _controller.index.value = page;
+          onPageChanged: (int autalPage) {
+            _controller.index.value = autalPage;
           },
           children: [
             Container(
@@ -90,7 +91,8 @@ class _HomePageState extends State<HomePage>
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: SearchField(
                             controller: _controller.landEC,
-                            suggestions: _controller.waterConsumptions
+                            suggestions: _controller
+                                .waterConsumptions //TODO: REVER PARA ATUALIZAR NO DAO
                                 .map((WaterConsumptionModel wc) =>
                                     '${wc.landName!}')
                                 .toList(),
@@ -102,11 +104,11 @@ class _HomePageState extends State<HomePage>
                             maxSuggestionsInViewPort: 5,
                             itemHeight: 50,
                             onTap: (value) {
-                              _controller.currentWaterConsumption = _controller
-                                  .waterConsumptions
-                                  .firstWhere((wc) =>
-                                      wc.landName ==
-                                      value); //.t. tratar null import 'package:collection/collection.dart'; firstWhereOrElseNull
+                              _controller.currentWaterConsumption =
+                                  _controller.waterConsumptions.firstWhere(
+                                (wc) => wc.landName == value,
+                              );
+                              //TODO: tratar null import 'package:collection/collection.dart'; firstWhereOrElseNull
 
                               setState(() {
                                 _controller.lastReadEC.text = _controller
@@ -188,14 +190,18 @@ class _HomePageState extends State<HomePage>
                           child: photo == null
                               ? Center(
                                   child: Text(
-                                  'Tire uma foto',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontFamily: 'Roboto',
-                                    fontWeight: FontWeight.w600,
+                                    'Tire uma foto',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontFamily: 'Roboto',
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ))
-                              : Image.memory(photo!, fit: BoxFit.cover),
+                                )
+                              : Image.memory(
+                                  photo!,
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                       ),
                       SizedBox(height: 10),
@@ -229,8 +235,11 @@ class _HomePageState extends State<HomePage>
                                   photo = null;
                                 });
                               } catch (e) {
-                                LibComp.showMessage(context,
-                                    'Falha ao efetuar leitura', e.toString());
+                                LibComp.showMessage(
+                                  context,
+                                  'Falha ao efetuar leitura',
+                                  e.toString(),
+                                );
                               }
                             } else {
                               Get.snackbar(
@@ -280,7 +289,7 @@ class _HomePageState extends State<HomePage>
                               Row(
                                 children: [
                                   Text(
-                                    'A Enviar: ',
+                                    'Pendentes: ',
                                     style: TextStyle(fontSize: 15),
                                   ),
                                   Text(
