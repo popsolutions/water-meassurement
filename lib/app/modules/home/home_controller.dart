@@ -43,6 +43,16 @@ class HomeController extends GetxController {
     await _service.saveWaterConsumptionOdoo(currentWaterConsumption);
   }
 
+  currentWaterConsumptionGetByAddress(value) {
+    var wcs = <WaterConsumptionModel>[];
+    for (var i = 0; i < waterConsumptions.length; i++) {
+      if (waterConsumptions[i].landAddress == value) {
+        wcs.add(waterConsumptions[i]);
+      }
+    }
+    return wcs;
+  }
+
   Future<void> readWaterConsumption() async {
     await _service.readWaterConsumption();
   }
@@ -106,7 +116,8 @@ class HomeController extends GetxController {
           await _service.saveWaterConsumptionOdoo(waterConsumptionModel);
           await logInsert(TypeLogEnum.SendDraftToOdoo_3);
 
-          await _service.saveWaterConsumptionOdooToPending(waterConsumptionModel);
+          await _service
+              .saveWaterConsumptionOdooToPending(waterConsumptionModel);
           await logInsert(TypeLogEnum.SendPendingToOdoo_4);
 
           waterConsumptionModel.statesendserver = StateSendServerEnum.send_5;

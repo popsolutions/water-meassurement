@@ -5,6 +5,8 @@ import 'package:water_meassurement/app/shared/enums/enums.dart';
 class WaterConsumptionModel {
   int? landId;
   String? landName;
+  String? landAddress;
+  int? landNumber;
   int? id;
   String? date;
   String? photo;
@@ -19,6 +21,8 @@ class WaterConsumptionModel {
     this.id,
     this.landId,
     this.landName,
+    this.landAddress,
+    this.landNumber,
     this.date,
     this.photo,
     this.lastRead,
@@ -34,6 +38,8 @@ class WaterConsumptionModel {
       'id': id,
       'land_id': landId,
       'land_name': landName,
+      'property_land_address': landAddress,
+      'property_land_number': landNumber,
       'date': date,
       'photo': photo,
       'last_read': lastRead,
@@ -48,6 +54,8 @@ class WaterConsumptionModel {
       'id': id,
       'land_id': landId,
       'land_name': landName,
+      'property_land_address': landAddress,
+      'property_land_number': landNumber,
       'date': date,
       'photo': photo,
       'last_read': lastRead,
@@ -64,6 +72,8 @@ class WaterConsumptionModel {
       id: map['id'],
       landId: map['land_id'][0],
       landName: map['land_id'][1],
+      landAddress: map['property_land_address'],
+      landNumber: map['property_land_number'],
       date: map['date'],
       photo: map['photo'],
       lastRead: double.parse(map['last_read'].toString()),
@@ -78,6 +88,8 @@ class WaterConsumptionModel {
       id: map['id'],
       landId: map['land_id'],
       landName: map['land_name'],
+      landAddress: map['property_land_address'],
+      landNumber: map['property_land_number'],
       date: map['date'],
       photo: map['photo'],
       lastRead: map['last_read'],

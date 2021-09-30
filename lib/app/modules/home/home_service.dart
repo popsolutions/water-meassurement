@@ -12,7 +12,8 @@ class HomeService {
     );
   }
 
-  Future<void> saveWaterConsumptionOdooToPending(WaterConsumptionModel wc) async {
+  Future<void> saveWaterConsumptionOdooToPending(
+      WaterConsumptionModel wc) async {
     wc.state = 'pending';
 
     await odoo.write(
@@ -49,6 +50,8 @@ class HomeService {
         "id",
         "land_id",
         "name",
+        "property_land_address",
+        "property_land_number",
         "date",
         "last_read",
         "current_read",

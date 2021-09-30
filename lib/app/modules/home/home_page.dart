@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
@@ -25,6 +26,9 @@ class _HomePageState extends State<HomePage>
 
   final pc = PageController(initialPage: 0);
   Uint8List? photo;
+  var waterConsumptions = <WaterConsumptionModel>[];
+  var itemSelected;
+  var wcLocal;
 
   @override
   void initState() {
@@ -63,9 +67,8 @@ class _HomePageState extends State<HomePage>
                 child: IconButton(
                   icon: Icon(Icons.sync),
                   onPressed: () async {
-                    if (_controller.amountToSend.value != 0) {
-                      await _controller
-                          .processListSendsWaterConsumptionOdoo(); //TODO: REVER
+                    if (_controller.amountToSend.value <= 0) {
+                      _controller.processListSendsWaterConsumptionOdoo();
                     }
                   },
                 ),
@@ -91,10 +94,10 @@ class _HomePageState extends State<HomePage>
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: SearchField(
                             controller: _controller.landEC,
-                            suggestions: _controller
-                                .waterConsumptions //TODO: REVER PARA ATUALIZAR NO DAO
+                            suggestions: _controller.waterConsumptions
                                 .map((WaterConsumptionModel wc) =>
-                                    '${wc.landName!}')
+                                    '${wc.landAddress}')
+                                .toSet()
                                 .toList(),
                             hint: "Selecione um Terreno",
                             searchStyle: TextStyle(
@@ -104,11 +107,14 @@ class _HomePageState extends State<HomePage>
                             maxSuggestionsInViewPort: 5,
                             itemHeight: 50,
                             onTap: (value) {
+                              waterConsumptions = _controller
+                                  .currentWaterConsumptionGetByAddress(value);
+                              FocusScope.of(context).unfocus();
+
                               _controller.currentWaterConsumption =
-                                  _controller.waterConsumptions.firstWhere(
-                                (wc) => wc.landName == value,
-                              );
-                              //TODO: tratar null import 'package:collection/collection.dart'; firstWhereOrElseNull
+                                  waterConsumptions.firstWhere((wc) {
+                                return wc.landAddress == value;
+                              });
 
                               setState(() {
                                 _controller.lastReadEC.text = _controller
@@ -127,6 +133,30 @@ class _HomePageState extends State<HomePage>
                           ),
                         );
                       }),
+                      SizedBox(height: 10),
+                      Visibility(
+                        visible: waterConsumptions.length > 0,
+                        child: ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: waterConsumptions.length,
+                          itemBuilder: (_, index) {
+                            final wc = waterConsumptions[index];
+
+                            return RadioListTile(
+                              value: index,
+                              groupValue: itemSelected,
+                              title: Text('nº ${wc.landNumber!}'),
+                              onChanged: (ind) {
+                                setState(() {
+                                  itemSelected = ind;
+                                  _controller.currentWaterConsumption = wc;
+                                });
+                              },
+                            );
+                          },
+                        ),
+                      ),
                       SizedBox(height: 10),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -159,6 +189,10 @@ class _HomePageState extends State<HomePage>
                                 onChanged: (value) {
                                   _controller.currentWaterConsumption
                                       .currentRead = double.parse(value);
+                                  log(
+                                    _controller.currentWaterConsumption
+                                        .toJson(),
+                                  );
                                 },
                               ),
                             ),

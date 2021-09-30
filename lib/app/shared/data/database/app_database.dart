@@ -33,6 +33,8 @@ class AppDatabase {
     id INT PRIMARY KEY,
     land_id INT,
     land_name TEXT,
+    property_land_address TEXT,
+    property_land_number INT,
     date TEXT,
     photo TEXT,
     last_read REAL,
