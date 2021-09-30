@@ -28,7 +28,6 @@ class _HomePageState extends State<HomePage>
   Uint8List? photo;
   var waterConsumptions = <WaterConsumptionModel>[];
   var itemSelected;
-  var wcLocal;
 
   @override
   void initState() {
@@ -150,7 +149,13 @@ class _HomePageState extends State<HomePage>
                               onChanged: (ind) {
                                 setState(() {
                                   itemSelected = ind;
-                                  _controller.currentWaterConsumption = wc;
+                                  _controller.currentWaterConsumption
+                                      .landNumber = wc.landNumber;
+                                  _controller.currentWaterConsumption
+                                      .landAddress = wc.landAddress;
+                                  _controller.currentWaterConsumption.landName =
+                                      wc.landName;
+                                    
                                 });
                               },
                             );
@@ -243,8 +248,10 @@ class _HomePageState extends State<HomePage>
                         height: 50,
                         width: double.infinity,
                         child: ElevatedButton(
-                          child: Text('Salvar medição',
-                              style: TextStyle(fontSize: 20)),
+                          child: Text(
+                            'Salvar medição',
+                            style: TextStyle(fontSize: 20),
+                          ),
                           onPressed: () async {
                             if (_controller.currentReadEC.text
                                     .trim()
@@ -252,9 +259,7 @@ class _HomePageState extends State<HomePage>
                                 _controller.landEC.text.trim().isNotEmpty &&
                                 (_controller
                                         .currentWaterConsumption.currentRead! >
-                                    0) &&
-                                (_controller.currentWaterConsumption.landName ==
-                                    _controller.landEC.text)) {
+                                    0)) {
                               try {
                                 _controller
                                         .currentWaterConsumption.currentRead =
