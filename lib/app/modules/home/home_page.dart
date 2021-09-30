@@ -1,8 +1,16 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:searchfield/searchfield.dart';
+import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 import 'package:water_meassurement/app/modules/profile/profile_page.dart';
+import 'package:water_meassurement/app/shared/libcomp.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 import 'home_controller.dart';
 
@@ -14,7 +22,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin<HomePage> {
   final HomeController _controller = Get.find();
+  final AuthController auth = Get.find();
+
   final pc = PageController(initialPage: 0);
+  Uint8List? photo;
+  var waterConsumptions = <WaterConsumptionModel>[];
+  var itemSelected;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.processListSendsWaterConsumptionOdoo();
+  }
 
   @override
   void dispose() {
@@ -40,11 +59,26 @@ class _HomePageState extends State<HomePage>
           }),
           backgroundColor: Theme.of(context).colorScheme.secondary,
           centerTitle: true,
+          actions: [
+            Obx(() {
+              return Visibility(
+                visible: _controller.index.value == 0,
+                child: IconButton(
+                  icon: Icon(Icons.sync),
+                  onPressed: () async {
+                    if (_controller.amountToSend.value <= 0) {
+                      _controller.processListSendsWaterConsumptionOdoo();
+                    }
+                  },
+                ),
+              );
+            })
+          ],
         ),
         body: PageView(
           controller: pc,
-          onPageChanged: (int page) {
-            _controller.index.value = page;
+          onPageChanged: (int autalPage) {
+            _controller.index.value = autalPage;
           },
           children: [
             Container(
@@ -61,7 +95,8 @@ class _HomePageState extends State<HomePage>
                             controller: _controller.landEC,
                             suggestions: _controller.waterConsumptions
                                 .map((WaterConsumptionModel wc) =>
-                                    '${wc.landName!}')
+                                    '${wc.landAddress}')
+                                .toSet()
                                 .toList(),
                             hint: "Selecione um Terreno",
                             searchStyle: TextStyle(
@@ -71,19 +106,62 @@ class _HomePageState extends State<HomePage>
                             maxSuggestionsInViewPort: 5,
                             itemHeight: 50,
                             onTap: (value) {
-                              _controller.currentWaterConsumption = _controller
-                                  .waterConsumptions
-                                  .firstWhere((wc) => wc.landName == value);
+                              waterConsumptions = _controller
+                                  .currentWaterConsumptionGetByAddress(value);
+                              FocusScope.of(context).unfocus();
+
+                              _controller.currentWaterConsumption =
+                                  waterConsumptions.firstWhere((wc) {
+                                return wc.landAddress == value;
+                              });
 
                               setState(() {
                                 _controller.lastReadEC.text = _controller
                                     .currentWaterConsumption.lastRead
                                     .toString();
+                                if (_controller
+                                        .currentWaterConsumption.currentRead ==
+                                    0)
+                                  _controller.currentReadEC.clear();
+                                else
+                                  _controller.currentReadEC.text = _controller
+                                      .currentWaterConsumption.currentRead
+                                      .toString();
                               });
                             },
                           ),
                         );
                       }),
+                      SizedBox(height: 10),
+                      Visibility(
+                        visible: waterConsumptions.length > 0,
+                        child: ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: waterConsumptions.length,
+                          itemBuilder: (_, index) {
+                            final wc = waterConsumptions[index];
+
+                            return RadioListTile(
+                              value: index,
+                              groupValue: itemSelected,
+                              title: Text('nº ${wc.landNumber!}'),
+                              onChanged: (ind) {
+                                setState(() {
+                                  itemSelected = ind;
+                                  _controller.currentWaterConsumption
+                                      .landNumber = wc.landNumber;
+                                  _controller.currentWaterConsumption
+                                      .landAddress = wc.landAddress;
+                                  _controller.currentWaterConsumption.landName =
+                                      wc.landName;
+                                    
+                                });
+                              },
+                            );
+                          },
+                        ),
+                      ),
                       SizedBox(height: 10),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -116,6 +194,10 @@ class _HomePageState extends State<HomePage>
                                 onChanged: (value) {
                                   _controller.currentWaterConsumption
                                       .currentRead = double.parse(value);
+                                  log(
+                                    _controller.currentWaterConsumption
+                                        .toJson(),
+                                  );
                                 },
                               ),
                             ),
@@ -123,17 +205,81 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () async {
+                          final ImagePicker _picker = ImagePicker();
+                          final XFile? image = await _picker.pickImage(
+                            source: ImageSource.camera,
+                          );
+                          if (image != null) {
+                            photo = await File(image.path).readAsBytes();
+                            _controller.currentWaterConsumption.photo =
+                                base64Encode(
+                                    File(image.path).readAsBytesSync());
+                            setState(() {});
+                          }
+                        },
+                        child: Container(
+                          width: 150,
+                          height: 200,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF0F5F7),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: photo == null
+                              ? Center(
+                                  child: Text(
+                                    'Tire uma foto',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontFamily: 'Roboto',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                )
+                              : Image.memory(
+                                  photo!,
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
                       Container(
+                        height: 50,
                         width: double.infinity,
                         child: ElevatedButton(
-                          child: Text('Salvar medição'),
+                          child: Text(
+                            'Salvar medição',
+                            style: TextStyle(fontSize: 20),
+                          ),
                           onPressed: () async {
                             if (_controller.currentReadEC.text
                                     .trim()
                                     .isNotEmpty &&
-                                _controller.landEC.text.trim().isNotEmpty) {
-                              await _controller
-                                  .saveWaterConsumptionOdoo(context);
+                                _controller.landEC.text.trim().isNotEmpty &&
+                                (_controller
+                                        .currentWaterConsumption.currentRead! >
+                                    0)) {
+                              try {
+                                _controller
+                                        .currentWaterConsumption.currentRead =
+                                    double.parse(
+                                        _controller.currentReadEC.text);
+                                await _controller
+                                    .saveWaterConsumptionDao(context);
+                                _controller.currentReadEC.clear();
+                                _controller.lastReadEC.clear();
+                                _controller.landEC.clear();
+                                setState(() {
+                                  photo = null;
+                                });
+                              } catch (e) {
+                                LibComp.showMessage(
+                                  context,
+                                  'Falha ao efetuar leitura',
+                                  e.toString(),
+                                );
+                              }
                             } else {
                               Get.snackbar(
                                 'Falha ao Salvar',
@@ -147,7 +293,7 @@ class _HomePageState extends State<HomePage>
                           },
                         ),
                       ),
-                      SizedBox(height: 50),
+                      SizedBox(height: 20),
                       Obx(() {
                         return Visibility(
                           visible: _controller.isLoading.value,
@@ -156,6 +302,66 @@ class _HomePageState extends State<HomePage>
                           ),
                         );
                       }),
+                      Obx(() {
+                        return Container(
+                          width: double.infinity,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'Ler: ',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                  Text(
+                                    _controller.amountToRead.string,
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Spacer(),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Pendentes: ',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                  Text(
+                                    _controller.amountToSend.string,
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Spacer(),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Enviadas: ',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                  Text(
+                                    _controller.amountSend.string,
+                                    style: TextStyle(
+                                      color: Colors.blueAccent,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        );
+                      })
                     ],
                   ),
                 ),

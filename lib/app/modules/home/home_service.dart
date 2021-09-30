@@ -4,11 +4,22 @@ import 'package:water_meassurement/app/shared/models/land_model.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 
 class HomeService {
-  Future<void> saveWaterConsumption(WaterConsumptionModel wc) async {
+  Future<void> saveWaterConsumptionOdoo(WaterConsumptionModel wc) async {
     await odoo.write(
       AppConstants.waterConsumptionModel,
       [wc.id!],
       wc.toMap(),
+    );
+  }
+
+  Future<void> saveWaterConsumptionOdooToPending(
+      WaterConsumptionModel wc) async {
+    wc.state = 'pending';
+
+    await odoo.write(
+      AppConstants.waterConsumptionModel,
+      [wc.id!],
+      {"state": 'pending'},
     );
   }
 
@@ -39,6 +50,8 @@ class HomeService {
         "id",
         "land_id",
         "name",
+        "property_land_address",
+        "property_land_number",
         "date",
         "last_read",
         "current_read",
