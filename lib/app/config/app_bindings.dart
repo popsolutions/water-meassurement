@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
-import 'package:water_meassurement/app/modules/home/dao/water_consumption_dao.dart';
 import 'package:water_meassurement/app/modules/home/home_controller.dart';
 import 'package:water_meassurement/app/modules/home/home_service.dart';
 import 'package:water_meassurement/app/modules/login/login_controller.dart';
 import 'package:water_meassurement/app/modules/login/login_service.dart';
+import 'package:water_meassurement/app/shared/data/dao/water_consumption_dao.dart';
 
 class AppBindings implements Bindings {
   final _homeService = Get.put(HomeService());
@@ -14,7 +14,7 @@ class AppBindings implements Bindings {
   @override
   void dependencies() {
     Get.put(AuthController(_loginService));
-    Get.put(LoginController(), permanent: true);
+    Get.put(LoginController());
     Get.put(HomeController(_homeService, _homeDao));
   }
 }

@@ -1,12 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:water_meassurement/app/config/app_routes.dart';
 import 'odoo_response.dart';
 import 'odoo_version.dart';
 
 class Odoo extends GetConnect {
-  get _serverURL => 'https://riviera.popsolutions.co';
+  get _serverURL => 'https://riviera-prod.popsolutions.co';
+  get versionInfo => _serverURL + '/web/webclient/version_info';
   Map<String, String> _headers = {};
   var version = OdooVersion();
   String? _sessionId;
@@ -37,7 +41,7 @@ class Odoo extends GetConnect {
   Future<dynamic> authenticate(String username, String password) async {
     final path = createPath("/web/session/authenticate");
     final params = {
-      "db": 'riviera-new',
+      "db": 'riviera-migracao',
       "login": username,
       "password": password,
       "context": {}
@@ -178,8 +182,23 @@ class Odoo extends GetConnect {
     OdooResponse odooResponse =
         new OdooResponse(response.body, response.statusCode);
 
-    if (odooResponse.hasError())
+    if (odooResponse.hasError()) {
+      if (odooResponse.getErrorMessage() == 'Session expired') {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        Get.snackbar(
+          'Sessão expirou!',
+          'Faça login novamente.',
+          colorText: Colors.white,
+          backgroundColor: Colors.red,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(10),
+        );
+        await Future.delayed(Duration(seconds: 2));
+        Get.offAllNamed(Routes.LOGIN);
+      }
       throw odooResponse.getErrorMessage().toString();
+    }
 
     return odooResponse;
   }
@@ -197,11 +216,17 @@ class Odoo extends GetConnect {
     });
     print("------------------------------------------->>>>");
     final response = await post(url, body, headers: _headers);
-    _updateCookies(response);
-    print("<<<<============================================");
-    print("RESPONSE: ${response.body}");
-    print("<<<<============================================");
-    return response;
+
+    if (response.body == null) {
+      throw 'Odoo Conection error Url';
+    } else {
+      _updateCookies(response);
+      print("<<<<============================================");
+      print("RESPONSE: ${response.body}");
+      print("<<<<============================================");
+
+      return response;
+    }
   }
 
   _updateCookies(response) async {

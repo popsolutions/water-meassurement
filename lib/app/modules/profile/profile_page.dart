@@ -20,11 +20,22 @@ class _ProfilePageState extends State<ProfilePage>
   final HomeController _controller = Get.find();
   Uint8List? photo;
 
+  takePicture(ImageSource imageSource) async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: imageSource);
+    if (image != null) {
+      photo = await File(image.path).readAsBytes();
+      setState(() {});
+      auth.currentUser.image = base64Encode(File(image.path).readAsBytesSync());
+      await auth.sendImage();
+      Get.back();
+    }
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     auth = Provider.of<AuthController>(context, listen: false);
-    // photo = await File(auth.currentUser.image!).readAsBytes();
     photo = Base64Codec().decode(auth.currentUser.image!);
   }
 
@@ -65,18 +76,7 @@ class _ProfilePageState extends State<ProfilePage>
                             icon: Icon(Icons.camera_alt),
                             label: Text('Tire uma foto.'),
                             onPressed: () async {
-                              final ImagePicker _picker = ImagePicker();
-                              final XFile? image = await _picker.pickImage(
-                                source: ImageSource.camera,
-                              );
-                              if (image != null) {
-                                photo = await File(image.path).readAsBytes();
-                                setState(() {});
-                                auth.currentUser.image = base64Encode(
-                                    File(image.path).readAsBytesSync());
-                                await auth.sendImage(); //TODO: ERRO AO ENVIAR
-                                Get.back();
-                              }
+                              await takePicture(ImageSource.camera);
                               Get.back();
                             },
                           ),
@@ -87,18 +87,7 @@ class _ProfilePageState extends State<ProfilePage>
                             icon: Icon(Icons.attach_file_outlined),
                             label: Text('Escolha um arquivo'),
                             onPressed: () async {
-                              final ImagePicker _picker = ImagePicker();
-                              final XFile? image = await _picker.pickImage(
-                                source: ImageSource.gallery,
-                              );
-                              if (image != null) {
-                                photo = await File(image.path).readAsBytes();
-                                setState(() {});
-                                // auth.currentUser.image =
-                                //     await File(image.path).readAsBytes();
-                                // await auth.sendImage(); //TODO: ERRO AO ENVIAR
-                                Get.back();
-                              }
+                              await takePicture(ImageSource.gallery);
                               Get.back();
                             },
                           ),

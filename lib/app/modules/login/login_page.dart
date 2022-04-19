@@ -1,7 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:water_meassurement/app/config/app_constants.dart';
 import 'package:water_meassurement/app/config/app_images.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
@@ -24,6 +27,9 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     auth.emailEC.text = 'support@popsolutions.co';
     auth.passwordEC.text = '1ND1C0p4c1f1c0';
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await controller.checkUser(context);
+    });
   }
 
   @override
@@ -112,6 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Text('Entrar'),
                           onPressed: () async {
                             controller.isLoading.value = true;
+
                             final authProvider = Provider.of<AuthController>(
                               context,
                               listen: false,
@@ -119,13 +126,18 @@ class _LoginPageState extends State<LoginPage> {
 
                             await authProvider.login(
                               UserModel(
-                                username: 'support@popsolutions.co',
-                                password: '1ND1C0p4c1f1c0',
+                                username: auth.emailEC.text,
+                                password: auth.passwordEC.text,
                               ),
                             );
 
                             await authProvider.getImage();
                             await homeController.loginSaveWaterConsumptionsDB();
+                            final prefs = await SharedPreferences.getInstance();
+                            prefs.setString(
+                              AppConstants.CURRENT_USER_SHARED_PREFS,
+                              authProvider.currentUser.toJson(),
+                            );
                             controller.isLoading.value = false;
                             Get.offNamed(Routes.HOME);
                           },
