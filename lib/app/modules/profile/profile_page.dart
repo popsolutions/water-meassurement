@@ -36,12 +36,14 @@ class _ProfilePageState extends State<ProfilePage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     auth = Provider.of<AuthController>(context, listen: false);
-    photo = Base64Codec().decode(auth.currentUser.image!);
+    if (auth.currentUser.image != null)
+      photo = Base64Codec().decode(auth.currentUser.image!);
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(

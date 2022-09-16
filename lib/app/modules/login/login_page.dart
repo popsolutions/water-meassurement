@@ -25,8 +25,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    auth.emailEC.text = 'support@popsolutions.co';
-    auth.passwordEC.text = '1ND1C0p4c1f1c0';
+    // auth.emailEC.text = 'support@popsolutions.co';
+    // auth.passwordEC.text = '1ND1C0p4c1f1c0';
     WidgetsBinding.instance!.addPostFrameCallback((_) async {
       await controller.checkUser(context);
     });

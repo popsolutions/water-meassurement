@@ -2,3 +2,6 @@ adb shell
 cd /data/user/0/com.example.water_meassurement/databases
 
 adb pull /data/user/0/com.example.water_meassurement/databases/water.db /home/mateus/_dev/popsolutions/water-meassurement/sqlite
+
+
+"/home/mateus/programas/flutter/flutter 2_5_0/flutter/bin/flutter" build apk
