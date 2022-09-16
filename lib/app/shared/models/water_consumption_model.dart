@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:water_meassurement/app/shared/enums/enums.dart';
+import 'package:water_meassurement/app/shared/utils/global.dart';
 
 class WaterConsumptionModel {
   int? landId;
@@ -14,6 +15,8 @@ class WaterConsumptionModel {
   String? state;
   int? statesendserver; //StateSendServerEnum
   DateTime? datetimeSend;
+
+  DateTime? get date_ToDate => convertStringToDateTimeMM_DD_YYYY(date);
 
   WaterConsumptionModel({
     this.id,
@@ -34,7 +37,7 @@ class WaterConsumptionModel {
       'id': id,
       'land_id': landId,
       'land_name': landName,
-      'date': date,
+      'date': DateToSql(date_ToDate),
       'photo': photo,
       'last_read': lastRead,
       'current_read': currentRead,

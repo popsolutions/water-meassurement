@@ -9,7 +9,7 @@ import 'odoo_response.dart';
 import 'odoo_version.dart';
 
 class Odoo extends GetConnect {
-  get _serverURL => 'https://riviera-prod.popsolutions.co';
+  get _serverURL => 'https://portal.aarsl.com.br';
   get versionInfo => _serverURL + '/web/webclient/version_info';
   Map<String, String> _headers = {};
   var version = OdooVersion();
@@ -41,7 +41,8 @@ class Odoo extends GetConnect {
   Future<dynamic> authenticate(String username, String password) async {
     final path = createPath("/web/session/authenticate");
     final params = {
-      "db": 'riviera-migracao',
+      "db": 'riviera-migracao',//todo.mudar
+      // "db": 'riviera-migracao-local-0330',
       "login": username,
       "password": password,
       "context": {}

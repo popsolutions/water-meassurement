@@ -18,7 +18,13 @@ class LoginService extends GetxService {
       ["image"],
     );
     final List list = auth.getRecords();
-    return list[0]['image'];
+
+    final res = list[0]['image'];
+
+    if (res.runtimeType.toString() == 'bool')
+      return null;
+
+    return res;
   }
 
   sendImage({required int id, required Map values}) async {

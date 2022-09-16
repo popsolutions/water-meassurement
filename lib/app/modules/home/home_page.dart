@@ -169,6 +169,7 @@ class _HomePageState extends State<HomePage>
                           final ImagePicker _picker = ImagePicker();
                           final XFile? image = await _picker.pickImage(
                             source: ImageSource.camera,
+                            imageQuality: 20
                           );
                           if (image != null) {
                             photo = await File(image.path).readAsBytes();
@@ -206,6 +207,7 @@ class _HomePageState extends State<HomePage>
                           child: Text('Salvar medição',
                               style: TextStyle(fontSize: 20)),
                           onPressed: () async {
+                            print('x');
                             if (_controller.currentReadEC.text
                                     .trim()
                                     .isNotEmpty &&
@@ -214,7 +216,8 @@ class _HomePageState extends State<HomePage>
                                         .currentWaterConsumption.currentRead! >
                                     0) &&
                                 (_controller.currentWaterConsumption.landName ==
-                                    _controller.landEC.text)) {
+                                    _controller.landEC.text) &&
+                                (int.parse(_controller.currentReadEC.text == '' ? '0' :_controller.currentReadEC.text) < 100000)) {
                               try {
                                 _controller
                                         .currentWaterConsumption.currentRead =
@@ -233,9 +236,14 @@ class _HomePageState extends State<HomePage>
                                     'Falha ao efetuar leitura', e.toString());
                               }
                             } else {
+                              String mensagem = 'Preencha todos os campos';
+
+                              if ((int.parse(_controller.currentReadEC.text == '' ? '0' :_controller.currentReadEC.text)) >= 100000)
+                                mensagem = 'Leitura atual tem que ser inferior a 100.000';
+
                               Get.snackbar(
                                 'Falha ao Salvar',
-                                'Preencha todos os campos',
+                                mensagem,
                                 colorText: Colors.white,
                                 backgroundColor: Colors.red,
                                 snackPosition: SnackPosition.BOTTOM,

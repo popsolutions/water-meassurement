@@ -56,6 +56,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> loginSaveWaterConsumptionsDB() async {
+    //verificar se é necessário carregar o celular com property.water.consumption
     final waterConsumptionsApi = await _service.getWaterConsumptions();
     final waterConsumptionsDao = await _dao.getWaterConsumptionsDao();
     if (waterConsumptionsDao.isEmpty) {
