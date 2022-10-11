@@ -16,7 +16,7 @@ class WaterConsumptionDao {
       });
     });
 
-    print('Inseridos os Water ConsumptionS no banco local.');
+    print('Inseridos os Water Consumptions no banco local.');
   }
 
   Future<void> updateWaterConsumptionsDao(

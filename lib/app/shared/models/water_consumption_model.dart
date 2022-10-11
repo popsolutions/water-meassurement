@@ -36,7 +36,7 @@ class WaterConsumptionModel {
     return {
       'id': id,
       'land_id': landId,
-      'land_name': landName,
+      // 'land_name': landName,
       'date': DateToSql(date_ToDate),
       'photo': photo,
       'last_read': lastRead,
