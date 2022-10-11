@@ -58,17 +58,44 @@ class _HomePageState extends State<HomePage>
           centerTitle: true,
           actions: [
             Obx(() {
-              return Visibility(
-                visible: _controller.index.value == 0,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.sync,
-                  ),
-                  onPressed: () async {
-                    _controller.processListSendsWaterConsumptionOdoo();
-                  },
-                ),
-              );
+              return _controller.index.value == 0
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.sync,
+                      ),
+                      onPressed: () async {
+                        _controller.processListSendsWaterConsumptionOdoo();
+                      },
+                    )
+                  : IconButton(
+                      icon: Icon(
+                        Icons.update,
+                      ),
+                      onPressed: () async {
+                        await _controller.setAmount();
+
+                        if (_controller.amountToSend > 0) {
+                          if (!(await LibComp.showQuestion(context, 'Confirmação?',
+                              'Existem ${_controller.amountToSend.toString()} leituras que não foram enviadas. Se você continuar elas serão perdidas. Deseja relamente continuar?'))) {
+                            LibComp.showMessage(context, 'Aviso', 'Operação de atualização cancelada pelo Usuário.');
+                            throw 'Operação cancelada pelo usuário';
+                            //to.melhorias- Quando excluir leituras não enviadas, poderia armazenar no odoo em algum lugar estes dados
+                          }
+                        }
+                        await _controller.clearWaterConsumptionsDao();
+                        await _controller.loginSaveWaterConsumptionsDB();
+                        await _controller.setAmount();
+
+                        Get.snackbar(
+                          'Operação Concluída',
+                          'Os dados foram atualizados com sucesso',
+                          colorText: Colors.white,
+                          backgroundColor: Colors.green,
+                          snackPosition: SnackPosition.BOTTOM,
+                          margin: const EdgeInsets.all(10),
+                        );
+                      },
+                    );
             })
           ],
         ),
@@ -207,7 +234,6 @@ class _HomePageState extends State<HomePage>
                           child: Text('Salvar medição',
                               style: TextStyle(fontSize: 20)),
                           onPressed: () async {
-                            print('x');
                             if (_controller.currentReadEC.text
                                     .trim()
                                     .isNotEmpty &&

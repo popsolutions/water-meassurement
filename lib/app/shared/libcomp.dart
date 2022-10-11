@@ -91,4 +91,63 @@ class LibComp {
       );
     }
   }
+
+  static Future<bool> showQuestion(
+      BuildContext context, String _titulo, String _corpo,
+      [Function? _functionConfirmar,
+        String labelConfirmar = 'CONFIRMAR',
+        String labelCancelar = 'CANCELAR']) async {
+    bool confirmSelect = false;
+
+    //Botões
+    Widget _btnConfirmar = FlatButton(
+      child: Text(
+        labelConfirmar,
+        style: TextStyle(color: Colors.green, fontSize: 18),
+      ),
+      onPressed: () {
+        confirmSelect = true;
+
+        if (_functionConfirmar != null) _functionConfirmar();
+
+        Navigator.of(context).pop();
+      },
+    );
+
+    Widget _btnCancelar = FlatButton(
+      child: Text(
+        labelCancelar,
+        style: TextStyle(color: Colors.redAccent, fontSize: 18),
+      ),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    // AlertDialog
+    AlertDialog alert = AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: new BorderRadius.circular(10.0),
+      ),
+      title: Text(
+        _titulo,
+        style: TextStyle(
+            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+      ),
+      content: Text(_corpo),
+      actions: [
+        _btnConfirmar,
+        _btnCancelar,
+      ],
+    );
+    // Exibindo
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+
+    return confirmSelect;
+  }
+
 }
