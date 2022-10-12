@@ -217,6 +217,8 @@ class Odoo extends GetConnect {
       print(key + ':' + (value ?? '') + '\n');
     });
     print("------------------------------------------->>>>");
+
+    httpClient.timeout = Duration(seconds:20);
     final response = await post(url, body, headers: _headers);
 
     if (response.body == null) {
