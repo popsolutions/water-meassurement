@@ -48,7 +48,6 @@ class HomeService {
       [
         "id",
         "land_id",
-        "name",
         "date",
         "last_read",
         "current_read",

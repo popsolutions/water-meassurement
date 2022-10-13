@@ -84,6 +84,7 @@ class _HomePageState extends State<HomePage>
                         }
                         await _controller.clearWaterConsumptionsDao();
                         await _controller.loginSaveWaterConsumptionsDB();
+                        await _controller.getWaterConsumptionsDB();
                         await _controller.setAmount();
 
                         Get.snackbar(
@@ -136,17 +137,17 @@ class _HomePageState extends State<HomePage>
                                       value); //.t. tratar null import 'package:collection/collection.dart'; firstWhereOrElseNull
 
                               setState(() {
-                                _controller.lastReadEC.text = _controller
-                                    .currentWaterConsumption.lastRead
-                                    .toString();
+                                _controller.lastReadEC.text = (_controller
+                                    .currentWaterConsumption.lastRead ?? 0)
+                                    .toStringAsFixed(0);
                                 if (_controller
                                         .currentWaterConsumption.currentRead ==
                                     0)
                                   _controller.currentReadEC.clear();
                                 else
-                                  _controller.currentReadEC.text = _controller
-                                      .currentWaterConsumption.currentRead
-                                      .toString();
+                                  _controller.currentReadEC.text = (_controller
+                                      .currentWaterConsumption.currentRead ?? 0)
+                                      .toStringAsFixed(0);
                               });
                             },
                           ),
