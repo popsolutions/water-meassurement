@@ -2,6 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:water_meassurement/app/shared/utils/constants.dart';
 
+// Este arquivo parece defazado, foi susbtituído por "// Este arquivo parece defazado, foi susbtituído por "app_database.dart"
 class AppDatabase {
   AppDatabase._();
   static final AppDatabase instance = AppDatabase._();

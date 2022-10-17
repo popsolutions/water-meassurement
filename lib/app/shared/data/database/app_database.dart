@@ -26,6 +26,21 @@ class AppDatabase {
   _onCreate(db, version) async {
     await db.execute(_waterConsumptions);
     await db.execute(_waterLog);
+
+    String sql = '''
+      CREATE TABLE IF NOT EXISTS user (
+        username Text PRIMARY KEY,
+        password Text,
+        uid int,
+        name Text,
+        image Text,
+        partnerDisplayName Text,
+        companyId int,
+        partnerId int
+    ); 
+    ''';
+
+    await db.execute(sql);
   }
 
   String get _waterConsumptions => ''' 

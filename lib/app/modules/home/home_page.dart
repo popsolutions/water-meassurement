@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 import 'package:water_meassurement/app/modules/profile/profile_page.dart';
@@ -21,7 +22,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin<HomePage> {
   final HomeController _controller = Get.find();
-  final AuthController auth = Get.find();
+  AuthController auth = Get.find();
 
   final pc = PageController(initialPage: 0);
   Uint8List? photo;
@@ -30,6 +31,12 @@ class _HomePageState extends State<HomePage>
   void initState() {
     super.initState();
     _controller.processListSendsWaterConsumptionOdoo();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    auth = Provider.of<AuthController>(context, listen: false);
   }
 
   @override
@@ -56,6 +63,10 @@ class _HomePageState extends State<HomePage>
           }),
           backgroundColor: Theme.of(context).colorScheme.secondary,
           centerTitle: true,
+          leading:
+            auth.loginIsOnline ?
+              Icon(Icons.wifi, color: Colors.blue):
+              Icon(Icons.wifi_off, color: Colors.orange),
           actions: [
             Obx(() {
               return _controller.index.value == 0
@@ -64,37 +75,69 @@ class _HomePageState extends State<HomePage>
                         Icons.sync,
                       ),
                       onPressed: () async {
-                        _controller.processListSendsWaterConsumptionOdoo();
+                        if (auth.loginIsOffline){
+                          LibComp.showMessage(context, 'Opss', 'Você fez o login offline. Para sincronizar é preciso fazer o login quando o App estiver Online.');
+                        } else {
+                          _controller.processListSendsWaterConsumptionOdoo();
+                        }
                       },
                     )
-                  : IconButton(
+                  :
+                   _controller.isLoading.value?
+                   Row(
+                     children: [
+                       Center(
+                         child: Container(
+                           width: 16,
+                           height: 16,
+                             child: CircularProgressIndicator.adaptive()
+                         ),
+                       ),
+                       Container(
+                         width: 16,
+                       )
+                     ],
+                   ):
+
+                   IconButton(
                       icon: Icon(
                         Icons.update,
                       ),
                       onPressed: () async {
-                        await _controller.setAmount();
+                        if (auth.loginIsOffline){
+                        LibComp.showMessage(context, 'Opss', 'Você fez o login offline. Para sincronizar é preciso fazer o login quando o App estiver Online.');
+                        } else {
+                          _controller.isLoading.value = true;
+                          try {
+                            await _controller.setAmount();
 
-                        if (_controller.amountToSend > 0) {
-                          if (!(await LibComp.showQuestion(context, 'Confirmação?',
-                              'Existem ${_controller.amountToSend.toString()} leituras que não foram enviadas. Se você continuar elas serão perdidas. Deseja relamente continuar?'))) {
-                            LibComp.showMessage(context, 'Aviso', 'Operação de atualização cancelada pelo Usuário.');
-                            throw 'Operação cancelada pelo usuário';
-                            //to.melhorias- Quando excluir leituras não enviadas, poderia armazenar no odoo em algum lugar estes dados
+                            if (_controller.amountToSend > 0) {
+                              if (!(await LibComp.showQuestion(context, 'Confirmação?',
+                                  'Existem ${_controller.amountToSend
+                                      .toString()} leituras que não foram enviadas. Se você continuar elas serão perdidas. Deseja relamente continuar?'))) {
+                                LibComp.showMessage(context, 'Aviso', 'Operação de atualização cancelada pelo Usuário.');
+                                throw 'Operação cancelada pelo usuário';
+                                //to.melhorias- Quando excluir leituras não enviadas, poderia armazenar no odoo em algum lugar estes dados
+                              }
+                            }
+                            await _controller.clearWaterConsumptionsDao();
+                            await _controller.loginSaveWaterConsumptionsDB(true);
+                            await _controller.getWaterConsumptionsDB();
+                            await _controller.setAmount();
                           }
-                        }
-                        await _controller.clearWaterConsumptionsDao();
-                        await _controller.loginSaveWaterConsumptionsDB();
-                        await _controller.getWaterConsumptionsDB();
-                        await _controller.setAmount();
+                          finally {
+                            _controller.isLoading.value = false;
+                          }
 
-                        Get.snackbar(
-                          'Operação Concluída',
-                          'Os dados foram atualizados com sucesso',
-                          colorText: Colors.white,
-                          backgroundColor: Colors.green,
-                          snackPosition: SnackPosition.BOTTOM,
-                          margin: const EdgeInsets.all(10),
-                        );
+                          Get.snackbar(
+                            'Operação Concluída',
+                            'Os dados foram atualizados com sucesso',
+                            colorText: Colors.white,
+                            backgroundColor: Colors.green,
+                            snackPosition: SnackPosition.BOTTOM,
+                            margin: const EdgeInsets.all(10),
+                          );
+                        }
                       },
                     );
             })

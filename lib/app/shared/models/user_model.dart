@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+enum LoginOnlineOffline {online, offline}
+
 class UserModel {
   String? sessionId;
   int? uid;
@@ -10,6 +12,10 @@ class UserModel {
   String? partnerDisplayName;
   int? companyId;
   int? partnerId;
+  LoginOnlineOffline loginOnlineOffline = LoginOnlineOffline.offline;
+
+  bool get loginIsOnline => loginOnlineOffline == LoginOnlineOffline.online;
+  bool get loginIsOffline => !loginIsOnline;
 
   UserModel({
     this.sessionId,

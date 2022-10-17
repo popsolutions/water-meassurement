@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:water_meassurement/app/shared/database/app_database.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 
+//este arqwuivo está defazado. utilizar "/lib/app/shared/data/dao/water_consumption_dao.dart" para coisas novas e transferir o conteúdo deste arquivo para o outro assim que possível
 class WaterConsumptionDao {
   late Database _db;
 
@@ -29,8 +30,8 @@ class WaterConsumptionDao {
     return waterConsumptios;
   }
 
-  Future<void> logout() async {
-    _db = await AppDatabase.instance.database;
-    await _db.delete('waterConsumption');
-  }
+  // Future<void> logout() async {
+  //   _db = await AppDatabase.instance.database;
+  //   await _db.delete('waterConsumption');
+  // }
 }

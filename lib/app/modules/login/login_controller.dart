@@ -24,6 +24,7 @@ class LoginController extends GetxController {
       );
 
       authProvider.currentUser = UserModel.fromJson(json.decode(userPrefs));
+      authProvider.currentUser.loginOnlineOffline = LoginOnlineOffline.offline;
       Get.offAllNamed(Routes.HOME);
     }
   }

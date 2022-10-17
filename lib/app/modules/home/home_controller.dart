@@ -55,12 +55,15 @@ class HomeController extends GetxController {
     setAmount();
   }
 
-  Future<void> loginSaveWaterConsumptionsDB() async {
+  Future<void> loginSaveWaterConsumptionsDB(bool loginIsOnline) async {
     //verificar se é necessário carregar o celular com property.water.consumption
-    final waterConsumptionsApi = await _service.getWaterConsumptions();
     final waterConsumptionsDao = await _dao.getWaterConsumptionsDao();
-    if (waterConsumptionsDao.isEmpty) {
-      await _dao.saveWaterConsumptionsDaoList(waterConsumptionsApi);
+
+    if (loginIsOnline){
+      if (waterConsumptionsDao.isEmpty) {
+        final waterConsumptionsApi = await _service.getWaterConsumptions();
+        await _dao.saveWaterConsumptionsDaoList(waterConsumptionsApi);
+      }
     }
   }
 

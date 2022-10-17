@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
+import 'package:water_meassurement/app/shared/data/dao/UserDao.dart';
 
 import 'app/modules/auth/auth_controller.dart';
 import 'app/modules/login/login_service.dart';
@@ -11,7 +12,7 @@ class AppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider(create: (_) => AuthController(LoginService())),
+        Provider(create: (_) => AuthController(LoginService(), UserDao())),
       ],
       child: GetMaterialApp(
         theme: ThemeData(

@@ -9,6 +9,7 @@ import 'package:water_meassurement/app/config/app_images.dart';
 import 'package:water_meassurement/app/config/app_routes.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 import 'package:water_meassurement/app/modules/home/home_controller.dart';
+import 'package:water_meassurement/app/shared/libcomp.dart';
 import 'package:water_meassurement/app/shared/models/user_model.dart';
 import 'login_controller.dart';
 
@@ -27,9 +28,9 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     // auth.emailEC.text = 'support@popsolutions.co';
     // auth.passwordEC.text = '1ND1C0p4c1f1c0';
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
-      await controller.checkUser(context);
-    });
+    // WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    //   await controller.checkUser(context);
+    // });
   }
 
   @override
@@ -124,15 +125,26 @@ class _LoginPageState extends State<LoginPage> {
                               listen: false,
                             );
 
-                            await authProvider.login(
-                              UserModel(
-                                username: auth.emailEC.text,
-                                password: auth.passwordEC.text,
-                              ),
-                            );
+                            try{
+                              await authProvider.login(
+                                UserModel(
+                                  username: auth.emailEC.text,
+                                  password: auth.passwordEC.text,
+                                ),
+                              );
+                            } catch(e){
+                              controller.isLoading.value = false;
+
+                              if (e == 'invalid username or password') {
+                                LibComp.showMessage(context, 'Opps', 'Usuário/Senha inválido.');
+                              } else {
+                                LibComp.showMessage(context, 'Opps', 'Falha ao efetuar Login.\n$e');
+                              }
+                              throw 'Falha ao efetuar Login.';
+                            }
 
                             await authProvider.getImage();
-                            await homeController.loginSaveWaterConsumptionsDB();
+                            await homeController.loginSaveWaterConsumptionsDB(authProvider.loginIsOnline);
                             final prefs = await SharedPreferences.getInstance();
                             prefs.setString(
                               AppConstants.CURRENT_USER_SHARED_PREFS,
