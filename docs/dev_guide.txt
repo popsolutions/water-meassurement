@@ -1,0 +1,1 @@
+"/home/mateus/programas/flutter/flutter 2_5_0/flutter/bin/flutter" build apk
