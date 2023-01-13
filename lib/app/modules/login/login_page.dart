@@ -26,6 +26,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    auth.emailEC.text = 'rota1@rivierasl.com.br';
+    auth.passwordEC.text = 'rota1';
     // auth.emailEC.text = 'support@popsolutions.co';
     // auth.passwordEC.text = '1ND1C0p4c1f1c0';
     // WidgetsBinding.instance!.addPostFrameCallback((_) async {
@@ -118,40 +120,45 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child: Text('Entrar'),
                           onPressed: () async {
-                            controller.isLoading.value = true;
+                            try {
+                              controller.isLoading.value = true;
 
-                            final authProvider = Provider.of<AuthController>(
-                              context,
-                              listen: false,
-                            );
-
-                            try{
-                              await authProvider.login(
-                                UserModel(
-                                  username: auth.emailEC.text,
-                                  password: auth.passwordEC.text,
-                                ),
+                              final authProvider = Provider.of<AuthController>(
+                                context,
+                                listen: false,
                               );
+
+                              try {
+                                await authProvider.login(
+                                  UserModel(
+                                    username: auth.emailEC.text,
+                                    password: auth.passwordEC.text,
+                                  ),
+                                );
+                              } catch (e) {
+                                controller.isLoading.value = false;
+
+                                if (e == 'invalid username or password') {
+                                  LibComp.showMessage(context, 'Opps', 'Usuário/Senha inválido.');
+                                } else {
+                                  LibComp.showMessage(context, 'Opps', 'Falha ao efetuar Login.\n$e');
+                                }
+                                throw 'Falha ao efetuar Login.';
+                              }
+
+                              await authProvider.getImage();
+                              await homeController.loginSaveWaterConsumptionsDB(authProvider.loginIsOnline);
+                              final prefs = await SharedPreferences.getInstance();
+                              prefs.setString(
+                                AppConstants.CURRENT_USER_SHARED_PREFS,
+                                authProvider.currentUser.toJson(),
+                              );
+                              controller.isLoading.value = false;
+                              Get.offNamed(Routes.HOME);
                             } catch(e){
                               controller.isLoading.value = false;
-
-                              if (e == 'invalid username or password') {
-                                LibComp.showMessage(context, 'Opps', 'Usuário/Senha inválido.');
-                              } else {
-                                LibComp.showMessage(context, 'Opps', 'Falha ao efetuar Login.\n$e');
-                              }
-                              throw 'Falha ao efetuar Login.';
+                              LibComp.showMessage(context, 'Falha efetuando login', e.toString());
                             }
-
-                            await authProvider.getImage();
-                            await homeController.loginSaveWaterConsumptionsDB(authProvider.loginIsOnline);
-                            final prefs = await SharedPreferences.getInstance();
-                            prefs.setString(
-                              AppConstants.CURRENT_USER_SHARED_PREFS,
-                              authProvider.currentUser.toJson(),
-                            );
-                            controller.isLoading.value = false;
-                            Get.offNamed(Routes.HOME);
                           },
                         ),
                       ),

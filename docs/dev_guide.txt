@@ -1,1 +1,3 @@
 "/home/mateus/programas/flutter/flutter 2_5_0/flutter/bin/flutter" build apk
+
+path do app: "/home/mateus/_dev/popsolutions/water-meassurement/app/build/app/outputs/apk/release"

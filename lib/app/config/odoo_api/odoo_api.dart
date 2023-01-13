@@ -10,7 +10,7 @@ import 'odoo_version.dart';
 
 class Odoo extends GetConnect {
   get _serverURL => 'https://portal.aarsl.com.br';
-  // get _serverURL => 'http://192.168.0.102:8012';
+  // get _serverURL => 'http://192.168.0.105:8012';
   get versionInfo => _serverURL + '/web/webclient/version_info';
   Map<String, String> _headers = {};
   var version = OdooVersion();
