@@ -104,41 +104,44 @@ class _HomePageState extends State<HomePage>
                         Icons.update,
                       ),
                       onPressed: () async {
-                        if (auth.loginIsOffline){
-                        LibComp.showMessage(context, 'Opss', 'Você fez o login offline. Para sincronizar é preciso fazer o login quando o App estiver Online.');
-                        } else {
-                          _controller.isLoading.value = true;
-                          try {
-                            await _controller.setAmount();
+                            if (auth.loginIsOffline) {
+                              LibComp.showMessage(context, 'Opss',
+                                  'Você fez o login offline. Para sincronizar é preciso fazer o login quando o App estiver Online.');
+                            } else {
+                              _controller.isLoading.value = true;
+                              try {
+                                try {
+                                  await _controller.setAmount();
 
-                            if (_controller.amountToSend > 0) {
-                              if (!(await LibComp.showQuestion(context, 'Confirmação?',
-                                  'Existem ${_controller.amountToSend
-                                      .toString()} leituras que não foram enviadas. Se você continuar elas serão perdidas. Deseja relamente continuar?'))) {
-                                LibComp.showMessage(context, 'Aviso', 'Operação de atualização cancelada pelo Usuário.');
-                                throw 'Operação cancelada pelo usuário';
-                                //to.melhorias- Quando excluir leituras não enviadas, poderia armazenar no odoo em algum lugar estes dados
+                                  if (_controller.amountToSend > 0) {
+                                    if (!(await LibComp.showQuestion(context, 'Confirmação?',
+                                        'Existem ${_controller.amountToSend.toString()} leituras que não foram enviadas. Se você continuar elas serão perdidas. Deseja relamente continuar?'))) {
+                                      LibComp.showMessage(context, 'Aviso', 'Operação de atualização cancelada pelo Usuário.');
+                                      throw 'Operação cancelada pelo usuário';
+                                      //to.melhorias- Quando excluir leituras não enviadas, poderia armazenar no odoo em algum lugar estes dados
+                                    }
+                                  }
+                                  await _controller.clearWaterConsumptionsDao();
+                                  await _controller.loginSaveWaterConsumptionsDB(true);
+                                  await _controller.getWaterConsumptionsDB();
+                                  await _controller.setAmount();
+                                } finally {
+                                  _controller.isLoading.value = false;
+                                }
+
+                                Get.snackbar(
+                                  'Operação Concluída',
+                                  'Os dados foram atualizados com sucesso',
+                                  colorText: Colors.white,
+                                  backgroundColor: Colors.green,
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  margin: const EdgeInsets.all(10),
+                                );
+                              } catch (e) {
+                                LibComp.showMessage(context, 'Opss', 'Falha ao baixar as leituras para este mês:\n${e.toString()}');
                               }
                             }
-                            await _controller.clearWaterConsumptionsDao();
-                            await _controller.loginSaveWaterConsumptionsDB(true);
-                            await _controller.getWaterConsumptionsDB();
-                            await _controller.setAmount();
-                          }
-                          finally {
-                            _controller.isLoading.value = false;
-                          }
-
-                          Get.snackbar(
-                            'Operação Concluída',
-                            'Os dados foram atualizados com sucesso',
-                            colorText: Colors.white,
-                            backgroundColor: Colors.green,
-                            snackPosition: SnackPosition.BOTTOM,
-                            margin: const EdgeInsets.all(10),
-                          );
-                        }
-                      },
+                          },
                     );
             })
           ],
