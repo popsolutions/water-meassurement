@@ -16,7 +16,7 @@ class LoginService extends GetxService {
       _userDao.saveLoginOffline(userResponse);
       return userResponse;
     }catch(e){
-      if (e == 'Odoo Conection error Url') {
+      if (e.toString().toUpperCase().contains('Odoo Conection error Url'.toUpperCase())) {
         final userResponse = await _userDao.loginOffline(user);
         return userResponse;
       }

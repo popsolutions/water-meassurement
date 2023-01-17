@@ -218,11 +218,11 @@ class Odoo extends GetConnect {
     });
     print("------------------------------------------->>>>");
 
-    httpClient.timeout = Duration(seconds:20);
+    httpClient.timeout = Duration(seconds:1000);
     final response = await post(url, body, headers: _headers);
 
     if (response.body == null) {
-      throw 'Odoo Conection error Url';
+      throw 'Odoo Conection error Url or Timeout error';
     } else {
       _updateCookies(response);
       print("<<<<============================================");

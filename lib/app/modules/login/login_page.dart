@@ -120,32 +120,20 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child: Text('Entrar'),
                           onPressed: () async {
+                            controller.isLoading.value = true;
+
+                            final authProvider = Provider.of<AuthController>(
+                              context,
+                              listen: false,
+                            );
+
                             try {
-                              controller.isLoading.value = true;
-
-                              final authProvider = Provider.of<AuthController>(
-                                context,
-                                listen: false,
+                              await authProvider.login(
+                                UserModel(
+                                  username: auth.emailEC.text,
+                                  password: auth.passwordEC.text,
+                                ),
                               );
-
-                              try {
-                                await authProvider.login(
-                                  UserModel(
-                                    username: auth.emailEC.text,
-                                    password: auth.passwordEC.text,
-                                  ),
-                                );
-                              } catch (e) {
-                                controller.isLoading.value = false;
-
-                                if (e == 'invalid username or password') {
-                                  LibComp.showMessage(context, 'Opps', 'Usuário/Senha inválido.');
-                                } else {
-                                  LibComp.showMessage(context, 'Opps', 'Falha ao efetuar Login.\n$e');
-                                }
-                                throw 'Falha ao efetuar Login.';
-                              }
-
                               await authProvider.getImage();
                               await homeController.loginSaveWaterConsumptionsDB(authProvider.loginIsOnline);
                               final prefs = await SharedPreferences.getInstance();
@@ -154,11 +142,18 @@ class _LoginPageState extends State<LoginPage> {
                                 authProvider.currentUser.toJson(),
                               );
                               controller.isLoading.value = false;
-                              Get.offNamed(Routes.HOME);
-                            } catch(e){
+                            } catch (e) {
                               controller.isLoading.value = false;
-                              LibComp.showMessage(context, 'Falha efetuando login', e.toString());
+
+                              if (e == 'invalid username or password') {
+                                LibComp.showMessage(context, 'Opps', 'Usuário/Senha inválido.');
+                              } else {
+                                LibComp.showMessage(context, 'Opps', 'Falha ao efetuar Login.\n$e');
+                              }
+                              throw 'Falha ao efetuar Login.';
                             }
+
+                            Get.offNamed(Routes.HOME);
                           },
                         ),
                       ),
