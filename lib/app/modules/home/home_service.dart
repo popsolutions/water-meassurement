@@ -2,6 +2,7 @@ import 'package:water_meassurement/app/config/app_constants.dart';
 import 'package:water_meassurement/app/shared/utils/global.dart';
 import 'package:water_meassurement/app/shared/models/land_model.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
+import 'package:intl/intl.dart';
 
 class HomeService {
   Future<void> saveWaterConsumptionOdoo(WaterConsumptionModel wc) async {
@@ -40,10 +41,20 @@ class HomeService {
   }
 
   Future<List<WaterConsumptionModel>> getWaterConsumptions() async {
+    String currentYearMonth = await getCurrentYear_month();
+
+    DateTime currentYearMonth_FirstDay = DateTime.parse(currentYearMonth + '01');
+    currentYearMonth_FirstDay = DateTime(currentYearMonth_FirstDay.year, currentYearMonth_FirstDay.month - 1, currentYearMonth_FirstDay.day); // Vou subtrair 1 dia pois a data da água é o mês de referência e não o mês de venvimento. (Equivalente a vw_property_settings_monthly_last.year_month_property_water_consumption)
+    DateTime currentYearMonth_LastDay = DateTime(currentYearMonth_FirstDay.year, currentYearMonth_FirstDay.month + 1, 0);
+    final dateFormat = new DateFormat('yyyy-MM-dd');
+    String currentYearMonth_FirstDayOdoo = dateFormat.format(currentYearMonth_FirstDay);
+    String currentYearMonth_LastDayOdoo = dateFormat.format(currentYearMonth_LastDay);
+
     final response = await odoo.searchRead(
       AppConstants.waterConsumptionModel,
       [
-        ["state", "=", "draft"]
+        ["date", ">=", currentYearMonth_FirstDayOdoo],
+        ["date", "<=", currentYearMonth_LastDayOdoo]
       ],
       [
         "id",
@@ -61,5 +72,14 @@ class HomeService {
         json.map((e) => WaterConsumptionModel.fromJson(e)).toList();
 
     return listMission;
+  }
+
+  Future<String> getCurrentYear_month() async {
+    final response =
+        await odoo.searchRead(AppConstants.propertyWaterCatchmentMonthlyRate, [], ['year_month'], limit: 1, order: 'year_month desc');
+
+    final List json = response.getRecords();
+    String currentYearMonth = json[0]['year_month'].toString();
+    return currentYearMonth;
   }
 }

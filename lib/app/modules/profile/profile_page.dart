@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -143,6 +144,32 @@ class _ProfilePageState extends State<ProfilePage>
                 },
               ),
             ),
+            Expanded(child: Text('')),
+            Obx(() {
+              return Column(children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Faturas que vencem em:'),
+                    Text(
+                      _controller.currentYear_monthText.value,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Versão do Aplicativo:'),
+                    Text(
+                      _controller.appVersion,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
+                )
+              ]);
+            }),
           ],
         ),
       ),

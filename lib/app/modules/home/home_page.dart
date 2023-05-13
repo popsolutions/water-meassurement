@@ -48,6 +48,49 @@ class _HomePageState extends State<HomePage>
     _controller.lastReadEC.dispose();
   }
 
+  TextEditingController _textFieldController = TextEditingController();
+  bool _showPasswordDialogCancel = false;
+
+  _showPasswordDialog() async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Senha para liberação'),
+            content: TextFormField(
+              //not sure if i need this
+              controller: _textFieldController,
+              decoration: InputDecoration(hintText: 'Senha'),
+              maxLength: 15,
+              obscureText: true,
+              validator: (String? value) {
+                if (value!.isEmpty) {
+                  return 'Informe a senha';
+                }
+                //maybe not necessary for toString()
+
+                return null;
+              },
+            ),
+            actions: [
+              FlatButton(
+                child: Text('Cancelar'),
+                onPressed: () {
+                  _showPasswordDialogCancel = true;
+                  Navigator.pop(context);
+                }
+              ),
+              FlatButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -108,6 +151,18 @@ class _HomePageState extends State<HomePage>
                               LibComp.showMessage(context, 'Opss',
                                   'Você fez o login offline. Para sincronizar é preciso fazer o login quando o App estiver Online.');
                             } else {
+                              _textFieldController.text = '';
+                              _showPasswordDialogCancel = false;
+                              await _showPasswordDialog();
+
+                              if (_showPasswordDialogCancel)
+                                return;
+
+                              if (_textFieldController.text != 'rivi'){
+                                LibComp.showMessage(context, 'Aviso', 'Senha inválida.');
+                                return;
+                              }
+
                               _controller.isLoading.value = true;
                               try {
                                 try {

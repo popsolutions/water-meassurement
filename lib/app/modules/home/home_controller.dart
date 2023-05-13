@@ -10,6 +10,7 @@ import 'package:water_meassurement/app/shared/data/dao/water_consumption_dao.dar
 import 'package:water_meassurement/app/shared/enums/enums.dart';
 import 'package:water_meassurement/app/shared/models/land_model.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class HomeController extends GetxController {
   final HomeService _service;
@@ -26,6 +27,10 @@ class HomeController extends GetxController {
   final lastReadEC = TextEditingController();
   var titleAppBar = ['Nova Leitura', 'Perfil'];
   var index = 0.obs;
+  String currentYear_month = '';
+  var currentYear_monthText = ''.obs;
+  String appVersion = '';
+  List<String> monthsName = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
   var amountToRead = 0.obs;
   var amountToSend = 0.obs;
@@ -36,6 +41,10 @@ class HomeController extends GetxController {
   @override
   onInit() async {
     super.onInit();
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    appVersion = packageInfo.version;
+
     await getWaterConsumptionsDB();
   }
 
@@ -52,6 +61,13 @@ class HomeController extends GetxController {
     if (waterConsumptionsDao.isNotEmpty) {
       waterConsumptions.value = waterConsumptionsDao;
     }
+
+    DateTime currentYearMonth_Date = DateTime.parse(waterConsumptionsDao[0].date!);
+    currentYearMonth_Date = DateTime(currentYearMonth_Date.year, currentYearMonth_Date.month + 1, currentYearMonth_Date.day); // Vou adcionar 1 dia pois a data da água é o mês de referência e não o mês de venvimento. (Equivalente a vw_property_settings_monthly_last.year_month_property_water_consumption)
+
+    currentYear_month = currentYearMonth_Date.year.toString() + currentYearMonth_Date.month.toString().padLeft(2, '0');
+    currentYear_monthText.value = monthsName[currentYearMonth_Date.month] + '/' + currentYearMonth_Date.year.toString();
+
     setAmount();
   }
 

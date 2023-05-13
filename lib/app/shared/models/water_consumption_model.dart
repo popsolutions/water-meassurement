@@ -73,6 +73,7 @@ class WaterConsumptionModel {
       currentRead: double.parse(map['current_read'].toString()),
       readerId: (map['reader_id'] is bool ? 0 : map['reader_id'][0]),
       state: map['state'],
+      statesendserver: double.parse(map['current_read'].toString()) == 0 ? StateSendServerEnum.unread_1 : StateSendServerEnum.send_5
     );
   }
 
