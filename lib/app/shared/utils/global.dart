@@ -29,5 +29,9 @@ DateTime? convertStringToDateTimeMM_DD_YYYY(String? dateTime) {
 }
 
 String? DateToSql(DateTime? date) {
-  return (date == null) ? 'null' : '"${DateFormat('yyyy-MM-dd').format(date)}"';
+  return (date == null) ? null : '"${DateFormat('yyyy-MM-dd').format(date)}"';
+}
+
+String? DateTimeToSql(DateTime? date) {
+  return (date == null) ? null : DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
 }

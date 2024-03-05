@@ -1,6 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:water_meassurement/app/shared/data/database/app_database.dart';
 import 'package:water_meassurement/app/shared/enums/enums.dart';
+import 'package:water_meassurement/app/shared/models/property_water_consumption_route_custom_model.dart';
+import 'package:water_meassurement/app/shared/models/property_water_consumption_route_lands_model.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 
 class WaterConsumptionDao {
@@ -37,6 +39,12 @@ class WaterConsumptionDao {
       await txn.delete(
         'waterConsumption',
       );
+      await txn.delete(
+        'property_water_consumption_route_lands',
+      );
+      await txn.delete(
+        'property_water_consumption_route_custom',
+      );
     });
   }
 
@@ -50,6 +58,18 @@ class WaterConsumptionDao {
     }
     return waterConsumptios;
   }
+
+  Future<List<Property_water_consumption_route_custom>> getRouteCustomDao() async {
+    _db = await AppDatabase.instance.database;
+    final routesCustomDao = await _db.query('property_water_consumption_route_custom');
+    final List<Property_water_consumption_route_custom> listRoutesCustom = [];
+
+    for (final routesCustom in routesCustomDao) {
+      listRoutesCustom.add(Property_water_consumption_route_custom.fromDao(routesCustom));
+    }
+    return listRoutesCustom;
+  }
+
 
   Future<WaterConsumptionModel?> getNextSendOdooWaterConsumptionModel(
       [String waterConsumptionIgnore = '']) async {
@@ -120,4 +140,77 @@ select sum(amountToRead) amountToRead,
     dynamic response = await _db.rawQuery(query);
     return response;
   }
+
+  Future<void> saveProperty_water_consumption_route_customDaoList(
+      List<Property_water_consumption_route_custom> listRoute_custom) async {
+    _db = await AppDatabase.instance.database;
+
+    await _db.transaction((txn) async {
+      listRoute_custom.forEach((Property_water_consumption_route_custom rc) async {
+        await txn.insert('property_water_consumption_route_custom', rc.toMap());
+      });
+    });
+
+    print('Inseridos os Property_water_consumption_route no banco local.');
+  }
+
+  Future<void> saveProperty_water_consumption_route_landsDaoList(
+      List<Property_water_consumption_route_lands> listRoute_lands) async {
+    _db = await AppDatabase.instance.database;
+
+    await _db.transaction((txn) async {
+      listRoute_lands.forEach((Property_water_consumption_route_lands rc) async {
+        await txn.insert('property_water_consumption_route_lands', rc.toMap());
+      });
+    });
+
+    print('Inseridos os Property_water_consumption_lands no banco local.');
+  }
+
+  Future<dynamic> getNextRead(int routecustom_id) async {
+    String query = '''
+select wc.land_id
+  from property_water_consumption_route_lands rl
+       join waterConsumption wc on wc.land_id = rl.land_id and wc.statesendserver = 1/*Não lido*/
+ where rl.routecustom_id = ''' + routecustom_id.toString() + ''' 
+ order by rl.sequence 
+ limit 1
+''';
+
+    _db = await AppDatabase.instance.database;
+    dynamic response = await _db.rawQuery(query);
+    return response[0]['land_id'];
+  }
+
+
+  Future<int> getRoute_realReadSequence() async {
+    //Sequência Real de leitura
+    String query = '''
+select coalesce(max(wc.route_realreadsequence), 0) + 1 next_route_realreadsequence from waterConsumption wc ''';
+
+    _db = await AppDatabase.instance.database;
+    dynamic response = await _db.rawQuery(query);
+    return response[0]['next_route_realreadsequence'];
+  }
+
+  Future<int> getRoute_readSequence(int land_id, int route_custom_id) async {
+    //Sequência definida na rota
+    String query = '''
+select rl.sequence next_route_realreadsequence
+  from property_water_consumption_route_lands rl
+ where rl.routecustom_id = ''' + route_custom_id.toString() + ''' 
+   and rl.land_id = ''' + land_id.toString() + '''
+ limit 1 
+''';
+
+    _db = await AppDatabase.instance.database;
+    dynamic response = await _db.rawQuery(query);
+    try {
+      return response[0]['next_route_realreadsequence'];
+    } catch (e) {
+      return 0;
+    }
+
+  }
+
 }

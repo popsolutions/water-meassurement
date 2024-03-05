@@ -16,6 +16,11 @@ class WaterConsumptionModel {
   int? statesendserver; //StateSendServerEnum
   DateTime? datetimeSend;
 
+  int? route_custom_id;
+  int? route_sequence;
+  int? route_realreadsequence;
+  DateTime? read_datetime;
+
   DateTime? get date_ToDate => convertStringToDateTimeMM_DD_YYYY(date);
 
   WaterConsumptionModel({
@@ -30,6 +35,10 @@ class WaterConsumptionModel {
     this.state = 'draft',
     this.statesendserver = StateSendServerEnum.unread_1,
     this.datetimeSend,
+    this.route_custom_id,
+    this.route_realreadsequence,
+    this.route_sequence,
+    this.read_datetime
   });
 
   Map<String, dynamic> toMap() {
@@ -43,6 +52,10 @@ class WaterConsumptionModel {
       'current_read': currentRead,
       'reader_id': readerId,
       'state': state,
+      'route_custom_id': route_custom_id,
+      'route_sequence': route_sequence,
+      'route_realreadsequence': route_realreadsequence,
+      'read_datetime': DateTimeToSql(read_datetime),
     };
   }
 
@@ -58,7 +71,11 @@ class WaterConsumptionModel {
       'reader_id': readerId,
       'state': state,
       'statesendserver': statesendserver,
-      'datetime_send': datetimeSend.toString()
+      'datetime_send': DateTimeToSql(datetimeSend),
+      'route_custom_id': route_custom_id,
+      'route_sequence': route_sequence,
+      'route_realreadsequence': route_realreadsequence,
+      'read_datetime': DateTimeToSql(read_datetime),
     };
   }
 
@@ -73,7 +90,7 @@ class WaterConsumptionModel {
       currentRead: double.parse(map['current_read'].toString()),
       readerId: (map['reader_id'] is bool ? 0 : map['reader_id'][0]),
       state: map['state'],
-      statesendserver: double.parse(map['current_read'].toString()) == 0 ? StateSendServerEnum.unread_1 : StateSendServerEnum.send_5
+      statesendserver: double.parse(map['current_read'].toString()) == 0 ? StateSendServerEnum.unread_1 : StateSendServerEnum.send_5,
     );
   }
 
@@ -89,9 +106,13 @@ class WaterConsumptionModel {
       readerId: map['reader_id'],
       state: map['state'],
       statesendserver: map['statesendserver'],
-      datetimeSend: (map['datetime_send'] == 'null')
+      datetimeSend: (map['datetime_send'] == null)
           ? null
           : DateTime.parse(map['datetime_send']),
+      route_custom_id: map['route_custom_id'] == 'null' ? null : map['route_custom_id'],
+      route_sequence: map['route_sequence'] == 'null' ? null : map['route_sequence'] ,
+      route_realreadsequence: map['route_realreadsequence'] == 'null' ? null : map['route_realreadsequence'],
+      read_datetime: convertStringToDateTime(map['read_datetime']),
     );
   }
 

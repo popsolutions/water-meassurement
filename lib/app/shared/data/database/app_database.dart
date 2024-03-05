@@ -41,6 +41,31 @@ class AppDatabase {
     ''';
 
     await db.execute(sql);
+
+    sql = '''
+    CREATE TABLE IF NOT EXISTS property_water_consumption_route_custom (
+     id int PRIMARY KEY,
+     name text,
+     route_id int,
+     descricao text
+    ); 
+    ''';
+
+    await db.execute(sql);
+
+    sql = '''
+    CREATE TABLE IF NOT EXISTS property_water_consumption_route_lands (
+      id int,
+      routecustom_id int,
+      land_id int,
+      land_id_module_id_code text,
+      land_id_block_id_code text,
+      land_id_lot_id_code text,
+      "sequence" int
+    );
+    ''';
+
+    await db.execute(sql);
   }
 
   String get _waterConsumptions => ''' 
@@ -55,7 +80,11 @@ class AppDatabase {
     reader_id INT,
     state TEXT,
     statesendserver int,
-    datetime_send timestamp
+    datetime_send timestamp,
+    route_custom_id int,
+    route_sequence int,
+    route_realreadsequence int,
+    read_datetime datetime
     );
     
     CREATE INDEX indx_waterConsumption_statesendserver ON waterConsumption (statesendserver);

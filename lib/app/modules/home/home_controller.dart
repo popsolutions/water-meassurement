@@ -9,6 +9,7 @@ import 'package:water_meassurement/app/modules/home/home_service.dart';
 import 'package:water_meassurement/app/shared/data/dao/water_consumption_dao.dart';
 import 'package:water_meassurement/app/shared/enums/enums.dart';
 import 'package:water_meassurement/app/shared/models/land_model.dart';
+import 'package:water_meassurement/app/shared/models/property_water_consumption_route_custom_model.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -19,11 +20,14 @@ class HomeController extends GetxController {
 
   var lands = <LandModel>[].obs;
   var waterConsumptions = <WaterConsumptionModel>[].obs;
+  var listRouteCustom = <Property_water_consumption_route_custom>[].obs;
   var isLoading = false.obs;
   final format = DateFormat('MM/dd/yyyy');
   var currentWaterConsumption = WaterConsumptionModel();
+  Property_water_consumption_route_custom? currentRouteCustom;
   final landEC = TextEditingController();
   final currentReadEC = TextEditingController();
+  var currentReadEC_focusNode = FocusNode();
   final lastReadEC = TextEditingController();
   var titleAppBar = ['Nova Leitura', 'Perfil'];
   var index = 0.obs;
@@ -31,6 +35,7 @@ class HomeController extends GetxController {
   var currentYear_monthText = ''.obs;
   String appVersion = '';
   List<String> monthsName = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  final selectedRouteEC = TextEditingController();
 
   var amountToRead = 0.obs;
   var amountToSend = 0.obs;
@@ -62,6 +67,11 @@ class HomeController extends GetxController {
       waterConsumptions.value = waterConsumptionsDao;
     }
 
+    final routeCustomDao = await _dao.getRouteCustomDao();
+    if (routeCustomDao.isNotEmpty) {
+      listRouteCustom.value = routeCustomDao;
+    }
+
     DateTime currentYearMonth_Date = DateTime.parse(waterConsumptionsDao[0].date!);
     currentYearMonth_Date = DateTime(currentYearMonth_Date.year, currentYearMonth_Date.month + 1, currentYearMonth_Date.day); // Vou adcionar 1 dia pois a data da água é o mês de referência e não o mês de venvimento. (Equivalente a vw_property_settings_monthly_last.year_month_property_water_consumption)
 
@@ -77,8 +87,17 @@ class HomeController extends GetxController {
 
     if (loginIsOnline){
       if (waterConsumptionsDao.isEmpty) {
+
         final waterConsumptionsApi = await _service.getWaterConsumptions();
         await _dao.saveWaterConsumptionsDaoList(waterConsumptionsApi);
+
+        final property_water_consumption_route_custom = await _service.getProperty_water_consumption_route_custom();
+        await _dao.saveProperty_water_consumption_route_customDaoList(property_water_consumption_route_custom);
+
+        final property_water_consumption_route_lands = await _service.getProperty_water_consumption_route_lands();
+        await _dao.saveProperty_water_consumption_route_landsDaoList(property_water_consumption_route_lands);
+
+        print('Dao Atualizado.');
       }
     }
   }
@@ -88,9 +107,19 @@ class HomeController extends GetxController {
     currentWaterConsumption.readerId = _authProvider.currentUser.partnerId;
     currentWaterConsumption.date = format.format(DateTime.now());
     currentWaterConsumption.statesendserver = StateSendServerEnum.read_2;
+    currentWaterConsumption.read_datetime = DateTime.now();
+
+    if (currentRouteCustom != null){
+      currentWaterConsumption.route_custom_id = currentRouteCustom!.id;
+      currentWaterConsumption.route_sequence = await _dao.getRoute_readSequence(currentWaterConsumption.landId ?? 0, currentRouteCustom!.id);
+    }
+
+    currentWaterConsumption.route_realreadsequence = await _dao.getRoute_realReadSequence();
+
     await _dao.updateWaterConsumptionsDao(currentWaterConsumption);
     setAmount();
     processListSendsWaterConsumptionOdoo();
+    setNextRead();
   }
 
   Future<void> processListSendsWaterConsumptionOdoo() async {
@@ -165,5 +194,25 @@ class HomeController extends GetxController {
     amountToRead.value = response[0]['amountToRead'] ?? 0;
     amountToSend.value = response[0]['amountToSend'] ?? 0;
     amountSend.value = response[0]['amountSend'] ?? 0;
+  }
+
+  setNextRead() async {
+    int nextReadLand_id = 0;
+
+    if (currentRouteCustom != null) {
+      nextReadLand_id = await _dao.getNextRead(currentRouteCustom?.id ?? 0);
+    }
+
+    currentWaterConsumption = waterConsumptions.firstWhere((wc) => wc.landId == nextReadLand_id);
+
+    landEC.text = currentWaterConsumption.landName ?? '';
+    lastReadEC.text = (currentWaterConsumption.lastRead ?? 0).toStringAsFixed(0);
+
+    if (currentWaterConsumption.currentRead == 0)
+      currentReadEC.clear();
+    else
+      currentReadEC.text = (currentWaterConsumption.currentRead ?? 0).toStringAsFixed(0);
+
+    currentReadEC_focusNode.requestFocus();
   }
 }

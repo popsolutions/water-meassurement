@@ -1,4 +1,6 @@
 import 'package:water_meassurement/app/config/app_constants.dart';
+import 'package:water_meassurement/app/shared/models/property_water_consumption_route_custom_model.dart';
+import 'package:water_meassurement/app/shared/models/property_water_consumption_route_lands_model.dart';
 import 'package:water_meassurement/app/shared/utils/global.dart';
 import 'package:water_meassurement/app/shared/models/land_model.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
@@ -72,6 +74,51 @@ class HomeService {
         json.map((e) => WaterConsumptionModel.fromJson(e)).toList();
 
     return listMission;
+  }
+
+  Future<List<Property_water_consumption_route_custom>> getProperty_water_consumption_route_custom() async {
+
+    final response = await odoo.searchRead(
+      AppConstants.property_water_consumption_route_custom,
+      [
+        ["active", "=", "True"]
+      ],
+      [
+        "id",
+        "name",
+        "route_id",
+      ],
+    );
+
+    final List json = response.getRecords();
+    final listRoutes =
+    json.map((e) => Property_water_consumption_route_custom.fromJson(e)).toList();
+
+    return listRoutes;
+  }
+
+  Future<List<Property_water_consumption_route_lands>> getProperty_water_consumption_route_lands() async {
+
+    final response = await odoo.searchRead(
+      AppConstants.property_water_consumption_route_lands,
+      [
+        ["routecustom_id.active", "=", true]
+      ],
+      [
+        "id",
+        "routecustom_id",
+        "land_id",
+        "land_id_module_id_code",
+        "land_id_block_id_code",
+        "land_id_lot_id_code",
+        "sequence",
+      ],
+    );
+
+    final List json = response.getRecords();
+    final listRoutes = json.map((e) => Property_water_consumption_route_lands.fromJson(e)).toList();
+
+    return listRoutes;
   }
 
   Future<String> getCurrentYear_month() async {

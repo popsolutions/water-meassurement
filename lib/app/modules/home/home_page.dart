@@ -11,6 +11,7 @@ import 'package:searchfield/searchfield.dart';
 import 'package:water_meassurement/app/modules/auth/auth_controller.dart';
 import 'package:water_meassurement/app/modules/profile/profile_page.dart';
 import 'package:water_meassurement/app/shared/libcomp.dart';
+import 'package:water_meassurement/app/shared/models/property_water_consumption_route_custom_model.dart';
 import 'package:water_meassurement/app/shared/models/water_consumption_model.dart';
 import 'home_controller.dart';
 
@@ -102,7 +103,42 @@ class _HomePageState extends State<HomePage>
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: Obx(() {
-            return Text(_controller.titleAppBar[_controller.index.value]);
+            return _controller.index.value == 1
+                ? Text(_controller.titleAppBar[_controller.index.value])
+                : Container(
+                    padding: const EdgeInsets.all(0),
+                    color: Colors.transparent,
+                    child: Center(
+                      child: SearchField(
+                        marginColor: Colors.black12,
+                        // suggestionItemDecoration: BoxDecoration(color: Colors.deepPurple),
+                        searchInputDecoration: InputDecoration(
+                            fillColor: Colors.transparent,
+                            hintText: 'Selecionar Rota',
+                            hintStyle: TextStyle(color: Colors.white),
+                            suffixIcon: IconButton(
+                              onPressed: _controller.selectedRouteEC.clear,
+                              icon: Icon(Icons.clear),
+                            )),
+                        controller: _controller.selectedRouteEC,
+                        suggestions: _controller.listRouteCustom.map((Property_water_consumption_route_custom rc) => '${rc.name}').toList(),
+                        // hint: "Selecione uma Rota",
+                        searchStyle: TextStyle(
+                          backgroundColor: Colors.transparent,
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                        maxSuggestionsInViewPort: 5,
+                        itemHeight: 50,
+                        onTap: (value) async {
+                          _controller.currentRouteCustom = _controller.listRouteCustom.firstWhere((wc) => wc.name == value);
+                          await _controller.setNextRead();
+
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  );
           }),
           backgroundColor: Theme.of(context).colorScheme.secondary,
           centerTitle: true,
@@ -122,6 +158,7 @@ class _HomePageState extends State<HomePage>
                           LibComp.showMessage(context, 'Opss', 'Você fez o login offline. Para sincronizar é preciso fazer o login quando o App estiver Online.');
                         } else {
                           _controller.processListSendsWaterConsumptionOdoo();
+                          await _controller.setNextRead();
                         }
                       },
                     )
@@ -228,6 +265,11 @@ class _HomePageState extends State<HomePage>
                               fontSize: 18,
                               color: Colors.black.withOpacity(0.8),
                             ),
+                            searchInputDecoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  onPressed: _controller.landEC.clear,
+                                  icon: Icon(Icons.clear),
+                                )),
                             maxSuggestionsInViewPort: 5,
                             itemHeight: 50,
                             onTap: (value) {
@@ -276,6 +318,7 @@ class _HomePageState extends State<HomePage>
                             Expanded(
                               child: TextFormField(
                                 controller: _controller.currentReadEC,
+                                focusNode: _controller.currentReadEC_focusNode,
                                 decoration: InputDecoration(
                                   labelText: 'Leitura atual',
                                 ),
