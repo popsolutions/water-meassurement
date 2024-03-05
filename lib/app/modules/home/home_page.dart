@@ -385,7 +385,7 @@ class _HomePageState extends State<HomePage>
                                     .isNotEmpty &&
                                 _controller.landEC.text.trim().isNotEmpty &&
                                 (_controller
-                                        .currentWaterConsumption.currentRead! >
+                                        .currentWaterConsumption.currentRead! >=
                                     0) &&
                                 (_controller.currentWaterConsumption.landName ==
                                     _controller.landEC.text) &&
