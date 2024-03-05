@@ -241,6 +241,7 @@ class _HomePageState extends State<HomePage>
         body: PageView(
           controller: pc,
           onPageChanged: (int page) {
+            _controller.currentReadEC_focusNode.requestFocus();
             _controller.index.value = page;
           },
           children: [
