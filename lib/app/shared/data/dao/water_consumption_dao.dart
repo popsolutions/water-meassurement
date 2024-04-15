@@ -173,6 +173,13 @@ select wc.land_id
   from property_water_consumption_route_lands rl
        join waterConsumption wc on wc.land_id = rl.land_id and wc.statesendserver = 1/*Não lido*/
  where rl.routecustom_id = ''' + routecustom_id.toString() + ''' 
+   and rl."sequence" >= coalesce(
+         (select w.route_sequence  
+            from waterConsumption w
+           where w.route_custom_id = rl.routecustom_id 
+           order by w.route_realreadsequence desc
+           limit 1
+       ), 0) /*partir do último endereço lido*/  
  order by rl.sequence 
  limit 1
 ''';
